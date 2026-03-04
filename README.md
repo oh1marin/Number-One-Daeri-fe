@@ -1,6 +1,6 @@
-# ride-platform
+# Number-One-Daeri-fe
 
-대리운전 서비스 모노레포.
+대리운전 서비스 모노레포 (프론트엔드).
 
 ## 구조
 
@@ -8,7 +8,7 @@
 ride-platform/
   apps/
     web-home/       Next.js — 대외 홈페이지   (포트 3000)
-    web-admin/      Next.js — 운영 관리대장   (포트 3001)
+    web-admin/      Next.js — 운영 관리대장   (포트 3002)
     mobile-user/    [placeholder] Flutter 사용자 앱 — 별도 작업
     mobile-driver/  [placeholder] Flutter 기사 앱   — 별도 작업
   packages/
