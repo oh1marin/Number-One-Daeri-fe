@@ -1,0 +1,22 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# Next.js
+.next/
+out/
+
+# Flutter
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/pubspec.lock
+
+# API
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
