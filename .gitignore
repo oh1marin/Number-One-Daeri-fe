@@ -20,3 +20,17 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+docs/
+
+# TypeScript incremental (local)
+**/tsconfig.tsbuildinfo
+
+# Internal handoff / work notes — do not publish
+**/WORK_SUMMARY.md
+**/WORK_SUMMARY_*.md
+**/ADMIN_LAST_WORK.md
+**/BACKEND_COOKIE_AUTH.md
+
+# One-off local tooling (patches, dumps)
+scripts/

@@ -1,40 +1,18 @@
 import Link from "next/link";
+import { FeatureIcons } from "@/components/Icons";
+import { SiApple, SiGoogleplay } from "react-icons/si";
 
 const FEATURES = [
-  {
-    icon: "⚡",
-    title: "빠른 배차",
-    desc: "AI 기반 매칭 시스템으로 평균 5분 이내 기사를 배정합니다.",
-  },
-  {
-    icon: "🛡️",
-    title: "안전 보장",
-    desc: "철저한 심사를 통과한 전문 기사만 운행하며, 전 노선 보험 적용됩니다.",
-  },
-  {
-    icon: "💳",
-    title: "간편 결제",
-    desc: "현금, 카드, 마일리지 등 다양한 결제수단을 지원합니다.",
-  },
-  {
-    icon: "📍",
-    title: "실시간 추적",
-    desc: "기사 위치를 실시간으로 확인하고 가족과 공유할 수 있습니다.",
-  },
-  {
-    icon: "🕐",
-    title: "24시간 운영",
-    desc: "365일 24시간, 언제든지 이용 가능합니다.",
-  },
-  {
-    icon: "💬",
-    title: "전담 고객센터",
-    desc: "빠른 응답의 전담 고객센터가 항상 대기 중입니다.",
-  },
+  { icon: "fast", title: "빠른 배차", desc: "AI 기반 매칭 시스템으로 평균 5분 이내 기사를 배정합니다." },
+  { icon: "safe", title: "안전 보장", desc: "철저한 심사를 통과한 전문 기사만 운행하며, 전 노선 보험 적용됩니다." },
+  { icon: "payment", title: "간편 결제", desc: "현금, 카드, 마일리지 등 다양한 결제수단을 지원합니다." },
+  { icon: "tracking", title: "실시간 추적", desc: "기사 위치를 실시간으로 확인하고 가족과 공유할 수 있습니다." },
+  { icon: "hours", title: "24시간 운영", desc: "365일 24시간, 언제든지 이용 가능합니다." },
+  { icon: "support", title: "전담 고객센터", desc: "빠른 응답의 전담 고객센터가 항상 대기 중입니다." },
 ];
 
 const STEPS = [
-  { step: "01", title: "앱 설치", desc: "App Store 또는 Google Play에서 라이드 앱을 설치하세요." },
+  { step: "01", title: "앱 설치", desc: "App Store 또는 Google Play에서 일등대리 앱을 설치하세요." },
   { step: "02", title: "출발·도착지 입력", desc: "출발지와 도착지를 입력하고 예상 요금을 확인하세요." },
   { step: "03", title: "호출", desc: "원하는 옵션과 결제수단을 선택하고 기사를 호출하세요." },
   { step: "04", title: "안전 귀가", desc: "배정된 기사와 함께 안전하게 귀가하세요." },
@@ -43,9 +21,16 @@ const STEPS = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
+      {/* Hero — home 배경 + 문구 유지 */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-950 via-blue-950 to-gray-900 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(59,130,246,0.15),_transparent_60%)]" />
+        <img
+          src="/images/home.png"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-75"
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-blue-950/50 to-transparent" aria-hidden />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(59,130,246,0.15),_transparent_60%)]" aria-hidden />
         <div className="relative max-w-6xl mx-auto px-6 py-32 md:py-40">
           <div className="max-w-2xl">
             <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-semibold rounded-full mb-6 border border-blue-500/30">
@@ -64,7 +49,7 @@ export default function HomePage() {
                 href="#"
                 className="flex items-center gap-3 px-6 py-3 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-100 transition"
               >
-                <span className="text-xl">🍎</span>
+                <SiApple className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-xs text-gray-500">Download on the</div>
                   <div className="text-sm font-bold">App Store</div>
@@ -74,7 +59,7 @@ export default function HomePage() {
                 href="#"
                 className="flex items-center gap-3 px-6 py-3 bg-white/10 text-white border border-white/20 rounded-xl font-semibold hover:bg-white/20 transition"
               >
-                <span className="text-xl">▶</span>
+                <SiGoogleplay className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-xs text-gray-400">Get it on</div>
                   <div className="text-sm font-bold">Google Play</div>
@@ -90,7 +75,7 @@ export default function HomePage() {
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">왜 라이드인가요?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">왜 일등대리인가요?</h2>
             <p className="text-gray-500">고객의 안전과 편의를 최우선으로 생각합니다.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,7 +84,7 @@ export default function HomePage() {
                 key={f.title}
                 className="bg-white p-6 rounded-2xl border border-gray-100 hover:shadow-md transition"
               >
-                <div className="text-3xl mb-4">{f.icon}</div>
+                <div className="mb-4">{FeatureIcons[f.icon as keyof typeof FeatureIcons]}</div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
               </div>

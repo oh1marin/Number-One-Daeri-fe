@@ -40,7 +40,7 @@ export function generateId(): string {
 }
 
 // ─── Customer store ───────────────────────────────────────────────
-import { Customer } from "./types";
+import { Customer, CustomerListItem } from "./types";
 
 function nextCustomerNo(): number {
   const seq = parseInt(localStorage.getItem(CUSTOMER_SEQ_KEY) ?? "0") + 1;
@@ -48,10 +48,29 @@ function nextCustomerNo(): number {
   return seq;
 }
 
+/** 빈 목록일 때 자동 등록할 기본 고객 (데모용) */
+function getDefaultCustomers(): Customer[] {
+  const today = new Date().toISOString().slice(0, 10);
+  return [
+    { id: "demo-1", no: 1, registeredAt: today, dmSend: false, smsSend: true, category: "일반회원", name: "홍길동", info: "", memberNo: "", address: "서울시 강남구", addressDetail: "", phone: "02-1234-5678", mobile: "010-1234-5678", otherPhone: "", notes: "", referrerId: "" },
+    { id: "demo-2", no: 2, registeredAt: today, dmSend: false, smsSend: false, category: "지인", name: "김철수", info: "", memberNo: "", address: "경기도 성남시", addressDetail: "", phone: "", mobile: "010-9876-5432", otherPhone: "", notes: "", referrerId: "" },
+  ];
+}
+
 export function getCustomers(): Customer[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(CUSTOMER_KEY) ?? "[]"); }
-  catch { return []; }
+  try {
+    const raw = localStorage.getItem(CUSTOMER_KEY);
+    let arr: Customer[] = raw ? JSON.parse(raw) : [];
+    // 빈 목록이면 기본 고객 자동 등록
+    if (arr.length === 0) {
+      arr = getDefaultCustomers();
+      localStorage.setItem(CUSTOMER_KEY, JSON.stringify(arr));
+      const seq = Math.max(...arr.map((c) => c.no), 0);
+      localStorage.setItem(CUSTOMER_SEQ_KEY, String(seq));
+    }
+    return arr;
+  } catch { return []; }
 }
 
 export function saveCustomer(c: Omit<Customer, "id" | "no">): Customer {
@@ -74,6 +93,41 @@ export function deleteCustomer(id: string): void {
 
 export function getCustomerRides(customerId: string) {
   return getRecords().filter((r) => (r as any).customerId === customerId);
+}
+
+/** localStorage Customer를 CustomerListItem 형태로 변환 */
+export function getCustomersAsListItems(): CustomerListItem[] {
+  const cs = getCustomers();
+  return cs.map((c) => ({
+    id: c.id,
+    source: "customer" as const,
+    no: c.no,
+    registeredAt: c.registeredAt,
+    category: c.category,
+    name: c.name,
+    phone: c.phone,
+    mobile: c.mobile,
+    otherPhone: c.otherPhone,
+    address: c.address,
+    addressDetail: c.addressDetail,
+    info: c.info,
+    dmSend: c.dmSend,
+    smsSend: c.smsSend,
+    referrerId: c.referrerId,
+    memberNo: c.memberNo,
+    notes: c.notes,
+  }));
+}
+
+/** API 목록 + localStorage 전용 고객(API에 없는) 병합 */
+export function mergeApiWithLocalCustomers(
+  apiList: CustomerListItem[] | null,
+  localListItems: CustomerListItem[]
+): CustomerListItem[] {
+  if (!apiList) return localListItems;
+  const apiIds = new Set(apiList.map((c) => c.id));
+  const localOnly = localListItems.filter((c) => !apiIds.has(c.id));
+  return [...apiList, ...localOnly];
 }
 
 // ─── Driver store ─────────────────────────────────────────────────

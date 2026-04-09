@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import "./sheet.css";
+import { AuthProvider } from "@/lib/AuthContext";
+import AppShell from "@/components/AppShell";
 
 export const metadata: Metadata = {
-  title: "관리대장 | 라이드",
+  title: "관리자 페이지 | 일등대리",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="bg-gray-100 text-gray-900 antialiased flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1 overflow-auto">{children}</main>
+      <body className="sheet-page text-gray-900 antialiased min-h-screen">
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
       </body>
     </html>
   );

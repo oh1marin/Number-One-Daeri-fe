@@ -8,7 +8,7 @@ const NAV_LINKS = [
   { href: "/", label: "홈" },
   { href: "/about", label: "회사소개" },
   { href: "/location", label: "오시는길" },
-  { href: "/community", label: "커뮤니티" },
+  { href: "/community", label: "공지사항" },
   { href: "/contact", label: "상담문의" },
 ];
 
@@ -21,10 +21,8 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">R</span>
-          </div>
-          <span className="font-bold text-gray-900 text-lg">라이드</span>
+          <img src="/images/logo.png" alt="일등대리" className="h-10 w-auto object-contain rounded-xl" />
+          <span className="font-bold text-gray-900 text-lg">일등대리</span>
         </Link>
 
         {/* Desktop Nav */}
