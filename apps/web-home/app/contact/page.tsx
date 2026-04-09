@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { ContactIcons, SuccessIcon } from "@/components/Icons";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5174";
+import { getApiV1Base } from "@/lib/apiBase";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", content: "" });
@@ -21,7 +20,7 @@ export default function ContactPage() {
     setErrorMsg("");
 
     try {
-      const res = await fetch(`${API_BASE}/api/v1/contact`, {
+      const res = await fetch(`${getApiV1Base()}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

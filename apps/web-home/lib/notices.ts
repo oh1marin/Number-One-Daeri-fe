@@ -1,3 +1,5 @@
+import { getApiV1Base } from "./apiBase";
+
 export interface NoticeEvent {
   title: string;
   date: string;
@@ -116,12 +118,11 @@ export function getNoticeById(id: number): Notice | undefined {
 }
 
 /** API에서 공지 목록 조회. 실패 시 정적 NOTICES 사용 */
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-
 export async function fetchNotices(): Promise<Notice[]> {
-  if (!API_BASE) return NOTICES;
+  if (!process.env.NEXT_PUBLIC_API_BASE_URL?.trim()) return NOTICES;
+  const apiV1 = getApiV1Base();
   try {
-    const urls = [`${API_BASE}/api/v1/notices`, `${API_BASE}/notices`];
+    const urls = [`${apiV1}/notices`];
     for (const url of urls) {
       const res = await fetch(url, { next: { revalidate: 60 } });
       if (res.ok) {
@@ -130,7 +131,12 @@ export async function fetchNotices(): Promise<Notice[]> {
         const list = Array.isArray(raw) ? raw : [];
         if (list.length > 0) {
           return list.map((r: Record<string, unknown>) => ({
-            id: r.id != null ? r.id : 0,
+            id:
+              typeof r.id === "string" || typeof r.id === "number"
+                ? r.id
+                : r.id != null
+                  ? String(r.id)
+                  : 0,
             badge: String(r.badge ?? "공지"),
             badgeColor: String(r.badgeColor ?? "bg-red-100 text-red-600"),
             title: String(r.title ?? ""),
