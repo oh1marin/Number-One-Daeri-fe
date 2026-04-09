@@ -43,9 +43,9 @@ export default function InvoicesPage() {
   useEffect(() => { load(); }, [load]);
 
   // ─── 합계 자동 계산 ─────────────────────────────────────────────
-  const recalcItems = (items: InvoiceItem[]): InvoiceItem[] =>
+  const recalcItems = (items: InvoiceItem[], vatIncluded: boolean): InvoiceItem[] =>
     items.map((item) => {
-      const supply = item.vatIncluded
+      const supply = vatIncluded
         ? Math.round(item.unitPrice * item.quantity / (1 + item.vatRate / 100))
         : item.unitPrice * item.quantity;
       const supplyAmt = item.unitPrice && item.quantity ? supply : item.supplyAmt;
@@ -60,7 +60,7 @@ export default function InvoicesPage() {
   });
 
   const updateFormItems = (items: InvoiceItem[]) => {
-    const recalc = recalcItems(items);
+    const recalc = recalcItems(items, form.vatIncluded);
     setForm((p) => ({ ...p, items: recalc, ...calcTotals(recalc) }));
   };
 
@@ -145,27 +145,27 @@ export default function InvoicesPage() {
       <div className="flex gap-3">
         {/* ─── LEFT: 문서 목록 ─── */}
         <div className="w-[260px] flex-shrink-0">
-          <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
-            <div className="bg-gray-100 px-3 py-2 border-b border-gray-300 text-xs font-semibold text-gray-600 flex justify-between">
+          <div className="sheet-wrap overflow-hidden">
+            <div className="px-3 py-2 border-b border-gray-300 text-xs font-semibold text-gray-600 flex justify-between bg-[var(--sheet-header-bg)]">
               <span>문서목록 ({invoices.length}건)</span>
             </div>
             <div className="overflow-y-auto max-h-[calc(100vh-240px)]">
-              <table className="w-full text-xs">
-                <thead className="bg-gray-50 sticky top-0">
+              <table className="sheet-table w-full text-xs">
+                <thead className="sticky">
                   <tr>
                     {["문서번호","거래일자","합계금액"].map((h) => (
-                      <th key={h} className="px-2 py-1.5 text-left border-b border-gray-200 text-gray-500 font-medium">{h}</th>
+                      <th key={h} className="px-2 py-1.5 text-left font-medium">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody>
                   {invoices.length === 0 ? (
                     <tr><td colSpan={3} className="px-2 py-4 text-center text-gray-300">없음</td></tr>
                   ) : [...invoices].reverse().map((inv) => (
                     <tr
                       key={inv.id}
                       onClick={() => selectInvoice(inv)}
-                      className={`cursor-pointer hover:bg-blue-50 transition ${selected?.id === inv.id ? "bg-blue-100" : ""}`}
+                      className={`cursor-pointer ${selected?.id === inv.id ? "sheet-selected" : ""}`}
                     >
                       <td className="px-2 py-1.5 font-mono text-blue-600">{inv.docNo}</td>
                       <td className="px-2 py-1.5 text-gray-500">{inv.tradeDate}</td>
@@ -184,13 +184,13 @@ export default function InvoicesPage() {
             <BtnAction label="삭제" shortcut="F4" color="red" onClick={handleDelete} disabled={!selected} />
             <BtnAction label="환경설정" shortcut="F9" color="gray" onClick={() => setShowSettings(true)} />
             <BtnAction label="세금계산서 인쇄" shortcut="F7" color="green" onClick={() => { if (selected) { selectInvoice(selected); setPrintPreview(true); } }} disabled={!selected} />
-            <BtnAction label="거래명세서 인쇄" shortcut="F8" color="teal" onClick={() => { if (selected) { selectInvoice(selected); setPrintPreview(true); } }} disabled={!selected} />
+            <BtnAction label="거래명세서 인쇄" shortcut="F8" color="blue" onClick={() => { if (selected) { selectInvoice(selected); setPrintPreview(true); } }} disabled={!selected} />
           </div>
         </div>
 
         {/* ─── RIGHT: 입력 폼 ─── */}
         <div className="flex-1 min-w-0">
-          <div className="bg-white border border-gray-300 rounded-lg p-4">
+          <div className="sheet-panel">
             <div className="text-xs font-semibold text-gray-500 bg-gray-50 -mx-4 -mt-4 px-4 py-2 rounded-t-lg border-b border-gray-200 mb-4 flex items-center gap-4">
               <span>자료조회</span>
               {selected && <span className="font-mono text-blue-600">문서번호: {selected.docNo}</span>}
@@ -226,7 +226,13 @@ export default function InvoicesPage() {
                 <label className="block text-xs text-gray-500 mb-1">부가세 포함 여부</label>
                 <label className="inline-flex items-center gap-2 mt-1.5">
                   <input type="checkbox" checked={form.vatIncluded} disabled={isRO}
-                    onChange={(e) => setForm((p) => ({ ...p, vatIncluded: e.target.checked }))}
+                    onChange={(e) => {
+                      const vatIncluded = e.target.checked;
+                      setForm((p) => {
+                        const recalc = recalcItems(p.items, vatIncluded);
+                        return { ...p, vatIncluded, items: recalc, ...calcTotals(recalc) };
+                      });
+                    }}
                     className="accent-blue-600" />
                   <span className="text-xs text-gray-600">단가/공급가액에 부가세 포함</span>
                 </label>
@@ -234,43 +240,43 @@ export default function InvoicesPage() {
             </div>
 
             {/* 품목 테이블 */}
-            <div className="overflow-x-auto mb-3">
-              <table className="w-full text-xs border-collapse">
+            <div className="overflow-x-auto mb-3 sheet-wrap">
+              <table className="sheet-table w-full text-xs">
                 <thead>
-                  <tr className="bg-amber-100">
+                  <tr>
                     {["품목","규격","단가","수량","공급가액","부가세율(%)","부가세액",""].map((h,i) => (
-                      <th key={i} className="border border-gray-300 px-2 py-2 text-left text-gray-700 font-medium whitespace-nowrap">{h}</th>
+                      <th key={i} className="px-2 py-2 text-left font-medium whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {form.items.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 p-0">
+                    <tr key={item.id}>
+                      <td className="p-0">
                         <input value={item.name} disabled={isRO} onChange={(e) => handleItemChange(idx, "name", e.target.value)}
                           placeholder="품목명" className="w-full px-2 py-1.5 text-xs focus:outline-none focus:bg-blue-50 min-w-28" />
                       </td>
-                      <td className="border border-gray-200 p-0">
+                      <td className="p-0">
                         <input value={item.spec} disabled={isRO} onChange={(e) => handleItemChange(idx, "spec", e.target.value)}
                           placeholder="규격" className="w-20 px-2 py-1.5 text-xs focus:outline-none focus:bg-blue-50" />
                       </td>
-                      <td className="border border-gray-200 p-0">
+                      <td className="p-0">
                         <input type="number" value={item.unitPrice || ""} disabled={isRO} onChange={(e) => handleItemChange(idx, "unitPrice", e.target.value)}
                           placeholder="0" className="w-24 px-2 py-1.5 text-xs text-right focus:outline-none focus:bg-blue-50" />
                       </td>
-                      <td className="border border-gray-200 p-0">
+                      <td className="p-0">
                         <input type="number" value={item.quantity || ""} disabled={isRO} onChange={(e) => handleItemChange(idx, "quantity", e.target.value)}
                           placeholder="1" className="w-14 px-2 py-1.5 text-xs text-right focus:outline-none focus:bg-blue-50" />
                       </td>
-                      <td className="border border-gray-200 p-0">
+                      <td className="p-0">
                         <input type="number" value={item.supplyAmt || ""} disabled={isRO} onChange={(e) => handleItemChange(idx, "supplyAmt", e.target.value)}
                           placeholder="0" className="w-28 px-2 py-1.5 text-xs text-right focus:outline-none focus:bg-blue-50 bg-yellow-50" />
                       </td>
-                      <td className="border border-gray-200 p-0">
+                      <td className="p-0">
                         <input type="number" value={item.vatRate} disabled={isRO} onChange={(e) => handleItemChange(idx, "vatRate", e.target.value)}
                           className="w-16 px-2 py-1.5 text-xs text-right focus:outline-none focus:bg-blue-50" />
                       </td>
-                      <td className="border border-gray-200 p-0">
+                      <td className="p-0">
                         <input type="number" value={item.vatAmt || ""} disabled={isRO} onChange={(e) => handleItemChange(idx, "vatAmt", e.target.value)}
                           placeholder="0" className="w-24 px-2 py-1.5 text-xs text-right focus:outline-none focus:bg-blue-50 bg-yellow-50" />
                       </td>
@@ -530,12 +536,11 @@ function BtnAction({ label, shortcut, color, onClick, disabled = false }: {
     gray: "bg-gray-500 hover:bg-gray-600 text-white",
     red: "bg-red-500 hover:bg-red-600 text-white",
     green: "bg-green-600 hover:bg-green-700 text-white",
-    teal: "bg-teal-600 hover:bg-teal-700 text-white",
     orange: "bg-orange-500 hover:bg-orange-600 text-white",
   };
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`px-2 py-1.5 rounded text-xs font-medium transition leading-tight ${colors[color]} disabled:opacity-40 disabled:cursor-not-allowed`}>
+      className={`px-2 py-1.5 rounded text-xs font-medium transition leading-tight ${colors[color] ?? colors.gray} disabled:opacity-40 disabled:cursor-not-allowed`}>
       {label}<span className="block opacity-70 text-[9px]">[{shortcut}]</span>
     </button>
   );

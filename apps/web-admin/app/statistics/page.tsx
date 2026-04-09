@@ -45,7 +45,7 @@ export default function StatisticsPage() {
   const maxHourly = Math.max(...hourlyData, 1);
 
   const TABLE_CLS = "border border-gray-200 text-xs text-center";
-  const TH_CLS = "bg-amber-100 border border-gray-200 px-2 py-1.5 font-medium text-gray-700";
+  const TH_CLS = "bg-blue-50 border border-gray-200 px-2 py-1.5 font-medium text-gray-700";
   const TD_CLS = "border border-gray-200 px-2 py-1.5";
   const TD_VAL = "border border-gray-200 px-2 py-1.5 text-right font-medium";
 
@@ -76,16 +76,16 @@ export default function StatisticsPage() {
               <tr>
                 <th className={TH_CLS}>구분</th>
                 {MONTHS.map((m) => <th key={m} className={TH_CLS}>{m}</th>)}
-                <th className={`${TH_CLS} bg-amber-200`}>합계금액</th>
+                <th className={`${TH_CLS} bg-blue-100`}>합계금액</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className={`${TD_CLS} bg-amber-50 font-medium`}>금액</td>
+                <td className={`${TD_CLS} bg-blue-50 font-medium`}>금액</td>
                 {driverData.map((v, i) => (
                   <td key={i} className={TD_VAL}>{v > 0 ? v.toLocaleString() : ""}</td>
                 ))}
-                <td className={`${TD_VAL} bg-amber-50 font-bold text-blue-600`}>
+                <td className={`${TD_VAL} bg-blue-50 font-bold text-blue-600`}>
                   {driverTotal > 0 ? driverTotal.toLocaleString() : ""}
                 </td>
               </tr>
@@ -115,16 +115,16 @@ export default function StatisticsPage() {
               <tr>
                 <th className={TH_CLS}>구분</th>
                 {MONTHS.map((m) => <th key={m} className={TH_CLS}>{m}</th>)}
-                <th className={`${TH_CLS} bg-amber-200`}>합계금액</th>
+                <th className={`${TH_CLS} bg-blue-100`}>합계금액</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className={`${TD_CLS} bg-amber-50 font-medium`}>금액</td>
+                <td className={`${TD_CLS} bg-blue-50 font-medium`}>금액</td>
                 {pickupData.map((v, i) => (
                   <td key={i} className={TD_VAL}>{v > 0 ? v.toLocaleString() : ""}</td>
                 ))}
-                <td className={`${TD_VAL} bg-amber-50 font-bold text-blue-600`}>
+                <td className={`${TD_VAL} bg-blue-50 font-bold text-blue-600`}>
                   {pickupTotal > 0 ? pickupTotal.toLocaleString() : ""}
                 </td>
               </tr>
@@ -166,7 +166,7 @@ export default function StatisticsPage() {
             </thead>
             <tbody>
               <tr>
-                <td className={`${TD_CLS} bg-amber-50 font-medium`}>건수</td>
+                <td className={`${TD_CLS} bg-blue-50 font-medium`}>건수</td>
                 {hourlyData.slice(0, 12).map((v, i) => (
                   <td key={i} className={TD_VAL}>{v > 0 ? v : ""}</td>
                 ))}
@@ -182,7 +182,7 @@ export default function StatisticsPage() {
             </thead>
             <tbody>
               <tr>
-                <td className={`${TD_CLS} bg-amber-50 font-medium`}>건수</td>
+                <td className={`${TD_CLS} bg-blue-50 font-medium`}>건수</td>
                 {hourlyData.slice(12).map((v, i) => (
                   <td key={i} className={TD_VAL}>{v > 0 ? v : ""}</td>
                 ))}

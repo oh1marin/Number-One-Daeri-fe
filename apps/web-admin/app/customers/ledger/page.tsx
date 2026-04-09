@@ -2,23 +2,34 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getCustomers } from "@/lib/store";
-import { Customer } from "@/lib/types";
+import { useAuth } from "@/lib/AuthContext";
+import { getCustomersAsListItems } from "@/lib/store";
+import { fetchCustomersWithAppUsers } from "@/lib/customersApi";
+import type { CustomerListItem } from "@/lib/types";
 import Link from "next/link";
 
-type SortKey = "no" | "registeredAt" | "name" | "category" | "phone" | "mobile" | "address";
+type SortKey = "no" | "registeredAt" | "name" | "category" | "phone" | "mobile" | "address" | "source";
 
-function getPhone(c: Customer) {
+function getPhone(c: CustomerListItem) {
   return c.mobile || c.phone || c.otherPhone || "";
 }
 
-function getAddress(c: Customer) {
+function getAddress(c: CustomerListItem) {
   return [c.address, c.addressDetail].filter(Boolean).join(" ") || "";
+}
+
+/** ISO 날짜 → YYYY.MM.DD 형식 */
+function formatDate(s: string): string {
+  if (!s) return "";
+  const match = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return match ? `${match[1]}.${match[2]}.${match[3]}` : s;
 }
 
 export default function CustomersLedgerPage() {
   const router = useRouter();
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const { getAccessToken } = useAuth();
+  const [customers, setCustomers] = useState<CustomerListItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [searchField, setSearchField] = useState<SortKey>("name");
   const [sortKey, setSortKey] = useState<SortKey>("no");
@@ -30,16 +41,31 @@ export default function CustomersLedgerPage() {
   const [smsContent, setSmsContent] = useState("");
   const [smsSent, setSmsSent] = useState(false);
 
-  const load = useCallback(() => setCustomers(getCustomers()), []);
+  const load = useCallback(async () => {
+    setLoading(true);
+    const apiData = await fetchCustomersWithAppUsers(getAccessToken);
+    // API 연동 시 데이터가 있으면 사용, 없으면 로컬(기본 고객 포함) 사용
+    if (apiData && apiData.length > 0) {
+      setCustomers(apiData);
+    } else {
+      setCustomers(getCustomersAsListItems());
+    }
+    setLoading(false);
+  }, [getAccessToken]);
 
   useEffect(() => { load(); }, [load]);
 
   const filtered = customers
-    .filter((c) => !search.trim() || String(c[searchField]).toLowerCase().includes(search.toLowerCase()))
+    .filter((c) => {
+      if (!search.trim()) return true;
+      const val = c[searchField as keyof CustomerListItem];
+      return String(val ?? "").toLowerCase().includes(search.toLowerCase());
+    })
     .sort((a, b) => {
-      if (sortKey === "no") return a.no - b.no;
+      if (sortKey === "no") return (a.no ?? 0) - (b.no ?? 0);
       if (sortKey === "registeredAt") return a.registeredAt.localeCompare(b.registeredAt);
-      return String(a[sortKey]).localeCompare(String(b[sortKey]));
+      if (sortKey === "source") return (a.source || "").localeCompare(b.source || "");
+      return String(a[sortKey as keyof CustomerListItem] ?? "").localeCompare(String(b[sortKey as keyof CustomerListItem] ?? ""));
     });
 
   const selected = filtered[cursor] ?? null;
@@ -69,7 +95,7 @@ export default function CustomersLedgerPage() {
     else setCursor(filtered.length - 1);
   };
 
-  const [recipientsForDisplay, setRecipientsForDisplay] = useState<Customer[]>([]);
+  const [recipientsForDisplay, setRecipientsForDisplay] = useState<CustomerListItem[]>([]);
 
   const openSmsModal = () => {
     if (smsMode === "individual" && !selected) {
@@ -116,6 +142,11 @@ export default function CustomersLedgerPage() {
           <span className="text-gray-600">
             {filtered.length} / {filtered.length}
           </span>
+          {!loading && filtered.length === 0 && (
+            <span className="text-amber-600 text-xs" title="NEXT_PUBLIC_API_BASE_URL 확인, 로그인 필요">
+              💡 API 연동: {(process.env.NEXT_PUBLIC_API_BASE_URL ? "설정됨" : "미설정")} · 로그인: {getAccessToken() ? "됨" : "필요"}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           {[["<<", "first"], ["<", "prev"], [">", "next"], [">>", "last"]].map(([label, dir]) => (
@@ -134,6 +165,7 @@ export default function CustomersLedgerPage() {
               <option value="mobile">휴대폰</option>
               <option value="category">고객분류</option>
               <option value="address">주소</option>
+              <option value="source">구분</option>
             </select>
             <input value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="검색어"
@@ -144,62 +176,65 @@ export default function CustomersLedgerPage() {
       </div>
 
       {/* ─── 메인 그리드 ─── */}
-      <div className="flex-1 overflow-auto bg-white">
-        <table className="w-full text-xs border-collapse min-w-max">
-          <thead className="sticky top-0 bg-gray-200 z-10">
+      <div className="flex-1 overflow-auto sheet-wrap">
+        <table className="sheet-table w-full text-xs min-w-max">
+          <thead className="sticky">
             <tr>
-              <th className="border border-gray-400 px-1 py-1.5 w-8 text-center font-medium text-gray-700">선택</th>
-              <th className="border border-gray-400 px-1 py-1.5 w-6 text-center font-medium text-gray-700">우편</th>
-              <th className="border border-gray-400 px-1 py-1.5 w-6 text-center font-medium text-gray-700">문자</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-16 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-300"
+              <th className="px-1 py-1.5 w-8 text-center">선택</th>
+              <th className="px-2 py-1.5 w-20 min-w-[4.5rem] text-left cursor-pointer hover:opacity-90"
+                onClick={() => setSortKey("source")}>구분</th>
+              <th className="px-2 py-1.5 w-16 text-left cursor-pointer hover:opacity-90"
                 onClick={() => setSortKey("no")}>고객번호</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-20 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-300"
+              <th className="px-2 py-1.5 w-20 text-left cursor-pointer hover:opacity-90"
                 onClick={() => setSortKey("registeredAt")}>등록일자</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-20 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-300"
+              <th className="px-2 py-1.5 w-20 text-left cursor-pointer hover:opacity-90"
                 onClick={() => setSortKey("name")}>고객성명</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-20 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-300"
+              <th className="px-2 py-1.5 w-20 text-left cursor-pointer hover:opacity-90"
                 onClick={() => setSortKey("category")}>고객정보</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-24 text-left font-medium text-gray-700">연락처#1</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-24 text-left font-medium text-gray-700">연락처#2</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-24 text-left font-medium text-gray-700">휴대폰번호</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-16 text-left font-medium text-gray-700">우편번호</th>
-              <th className="border border-gray-400 px-2 py-1.5 min-w-32 text-left font-medium text-gray-700">주소(시,구,동)</th>
+              <th className="px-2 py-1.5 w-24 text-left">연락처#1</th>
+              <th className="px-2 py-1.5 w-24 text-left">휴대폰번호</th>
+              <th className="px-2 py-1.5 min-w-32 text-left">주소(시,구,동)</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {loading ? (
               <tr>
-                <td colSpan={12} className="py-10 text-center text-gray-400">
+                <td colSpan={9} className="py-10 text-center text-gray-400">로딩 중...</td>
+              </tr>
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="py-10 text-center text-gray-400">
                   고객 데이터가 없습니다. <Link href="/customers" className="text-blue-600 underline">고객자료관리</Link>에서 등록하세요.
                 </td>
               </tr>
             ) : filtered.map((c, i) => {
               const isRowSelected = selected?.id === c.id;
               const isChecked = checked.has(c.id);
+              const isApp = c.source === "app_user";
               return (
                 <tr
                   key={c.id}
                   onClick={() => setCursor(i)}
-                  className={`cursor-pointer border-b border-gray-100 transition
-                    ${isRowSelected ? "bg-blue-900 text-white" : i % 2 === 0 ? "bg-yellow-50 hover:bg-yellow-100" : "bg-white hover:bg-gray-50"}`}
+                  className={`cursor-pointer ${isRowSelected ? "sheet-selected" : ""}`}
                 >
-                  <td className="border-r border-gray-200 px-1 py-1 text-center" onClick={(e) => e.stopPropagation()}>
+                  <td className="px-1 py-1 text-center" onClick={(e) => e.stopPropagation()}>
                     {multiSelect && (
                       <input type="checkbox" checked={isChecked} onChange={() => toggleCheck(c.id)}
                         className="accent-blue-600 w-4 h-4 cursor-pointer" />
                     )}
                   </td>
-                  <td className="border-r border-gray-200 px-1 py-1 text-center">{c.dmSend ? "✓" : ""}</td>
-                  <td className="border-r border-gray-200 px-1 py-1 text-center">{c.smsSend ? "✓" : ""}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5 font-mono">{c.no}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{c.registeredAt}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5 font-medium">{c.name}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{c.info}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{c.phone}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{c.otherPhone}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{c.mobile}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{/* 우편번호 - Customer에 없음 */}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{getAddress(c)}</td>
+                  <td className="px-2 py-1.5">
+                    <span className={`px-1.5 py-0.5 rounded text-xs ${isApp ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
+                      {isApp ? "앱회원" : "고객"}
+                    </span>
+                  </td>
+                  <td className="px-2 py-1.5 font-mono">{c.no ?? "—"}</td>
+                  <td className="px-2 py-1.5">{formatDate(c.registeredAt)}</td>
+                  <td className="px-2 py-1.5 font-medium">{c.name}</td>
+                  <td className="px-2 py-1.5">{c.info ?? c.category ?? ""}</td>
+                  <td className="px-2 py-1.5">{c.phone}</td>
+                  <td className="px-2 py-1.5">{c.mobile}</td>
+                  <td className="px-2 py-1.5">{getAddress(c)}</td>
                 </tr>
               );
             })}
@@ -353,7 +388,7 @@ function LedgerBtn({
   };
   return (
     <button onClick={onClick}
-      className={`px-3 py-1.5 rounded text-xs font-medium transition ${colors[color]}`}>
+      className={`px-3 py-1.5 rounded text-xs font-medium transition ${colors[color] ?? colors.gray}`}>
       {label}{shortcut && <span className="ml-1 opacity-70">[{shortcut}]</span>}
     </button>
   );

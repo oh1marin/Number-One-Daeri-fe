@@ -3,8 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   getCustomers, saveCustomer, updateCustomer, deleteCustomer, getRecords,
+  getCustomersAsListItems, mergeApiWithLocalCustomers,
 } from "@/lib/store";
-import { Customer, CUSTOMER_CATEGORIES } from "@/lib/types";
+import { fetchCustomersWithAppUsers, isAppUser } from "@/lib/customersApi";
+import { useAuth } from "@/lib/AuthContext";
+import { Customer, CustomerListItem, CUSTOMER_CATEGORIES } from "@/lib/types";
 import { RideRecord } from "@/lib/types";
 
 // ─── 빈 폼 ────────────────────────────────────────────────────────
@@ -17,13 +20,21 @@ const BLANK: Omit<Customer, "id" | "no"> = {
   referrerId: "",
 };
 
+/** ISO 날짜 → YYYY.MM.DD */
+function formatRegisteredAt(s: string): string {
+  if (!s) return "";
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[1]}.${m[2]}.${m[3]}` : s;
+}
+
 type Mode = "new" | "edit" | "view";
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const { getAccessToken } = useAuth();
+  const [customers, setCustomers] = useState<CustomerListItem[]>([]);
   const [rides, setRides] = useState<RideRecord[]>([]);
   const [form, setForm] = useState<Omit<Customer, "id" | "no">>(BLANK);
-  const [selected, setSelected] = useState<Customer | null>(null);
+  const [selected, setSelected] = useState<CustomerListItem | null>(null);
   const [mode, setMode] = useState<Mode>("new");
   const [search, setSearch] = useState("");
   const [searchField, setSearchField] = useState<"name" | "phone" | "mobile" | "category">("name");
@@ -31,25 +42,41 @@ export default function CustomersPage() {
   const [catSearch, setCatSearch] = useState("");
   const [saved, setSaved] = useState(false);
   const [lastNo, setLastNo] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const load = useCallback(() => {
-    const cs = getCustomers();
-    setCustomers(cs);
-    setLastNo(cs.reduce((m, c) => Math.max(m, c.no), 0));
+  const load = useCallback(async () => {
+    setLoading(true);
+    const apiData = await fetchCustomersWithAppUsers(getAccessToken);
+    const localList = getCustomersAsListItems(); // 빈 시 기본 고객 자동 등록됨
+    const merged = (apiData && apiData.length > 0)
+      ? mergeApiWithLocalCustomers(apiData, localList)
+      : localList;
+    setCustomers(merged);
+    setLastNo(merged.reduce((m, c) => Math.max(m, c.no ?? 0), 0));
     setRides(getRecords());
-  }, []);
+    setLoading(false);
+  }, [getAccessToken]);
 
   useEffect(() => { load(); }, [load]);
 
   // 고객 선택 → view 모드
-  const selectCustomer = (c: Customer) => {
+  const selectCustomer = (c: CustomerListItem) => {
     setSelected(c);
     setForm({
-      registeredAt: c.registeredAt, dmSend: c.dmSend, smsSend: c.smsSend,
-      category: c.category, name: c.name, info: c.info, memberNo: c.memberNo,
-      address: c.address, addressDetail: c.addressDetail,
-      phone: c.phone, mobile: c.mobile, otherPhone: c.otherPhone,
-      notes: c.notes, referrerId: c.referrerId,
+      registeredAt: c.registeredAt || BLANK.registeredAt,
+      dmSend: c.dmSend ?? false,
+      smsSend: c.smsSend ?? false,
+      category: c.category || "",
+      name: c.name || "",
+      info: c.info || "",
+      memberNo: c.memberNo ?? "",
+      address: c.address ?? "",
+      addressDetail: c.addressDetail ?? "",
+      phone: c.phone ?? "",
+      mobile: c.mobile ?? "",
+      otherPhone: c.otherPhone ?? "",
+      notes: c.notes ?? "",
+      referrerId: c.referrerId ?? "",
     });
     setMode("view");
   };
@@ -60,7 +87,7 @@ export default function CustomersPage() {
     setMode("new");
   };
 
-  const handleEdit = () => { if (selected) setMode("edit"); };
+  const handleEdit = () => { if (selected && !isAppUser(selected)) setMode("edit"); };
 
   const handleSave = () => {
     if (!form.name.trim()) { alert("고객성명을 입력하세요."); return; }
@@ -68,9 +95,16 @@ export default function CustomersPage() {
     if (mode === "new") {
       const created = saveCustomer(form);
       load();
-      setSelected(created);
+      setSelected({
+        ...created,
+        source: "customer",
+        no: created.no,
+        referrerId: created.referrerId,
+        memberNo: created.memberNo,
+        notes: created.notes,
+      });
       setMode("view");
-    } else if (mode === "edit" && selected) {
+    } else if (mode === "edit" && selected && !isAppUser(selected)) {
       updateCustomer(selected.id, form);
       load();
       setMode("view");
@@ -81,11 +115,17 @@ export default function CustomersPage() {
 
   const handleDelete = () => {
     if (!selected) return;
+    if (isAppUser(selected)) {
+      alert("앱 회원은 여기서 삭제할 수 없습니다. /admin/users에서 관리해 주세요.");
+      return;
+    }
     if (!confirm(`"${selected.name}" 고객을 삭제할까요?`)) return;
     deleteCustomer(selected.id);
     load();
     handleNew();
   };
+
+  const canEditDelete = selected && !isAppUser(selected);
 
   const handleCancel = () => {
     if (selected) {
@@ -97,6 +137,8 @@ export default function CustomersPage() {
     }
   };
 
+  const isAppUserSelected = selected ? isAppUser(selected) : false;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setForm((p) => ({ ...p, [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value }));
@@ -105,7 +147,8 @@ export default function CustomersPage() {
   // 검색 필터
   const filtered = customers.filter((c) => {
     if (!search.trim()) return true;
-    return String(c[searchField]).toLowerCase().includes(search.toLowerCase());
+    const val = c[searchField as keyof CustomerListItem];
+    return String(val ?? "").toLowerCase().includes(search.toLowerCase());
   });
 
   // 선택 고객의 운행 이력
@@ -113,12 +156,13 @@ export default function CustomersPage() {
 
   // 마일리지 계산
   const totalFare = customerRides.reduce((s, r) => s + r.total, 0);
-  const referrals = selected ? customers.filter((c) => c.referrerId === selected.id) : [];
+  const localCustomers = getCustomers();
+  const referrals = selected ? localCustomers.filter((c) => c.referrerId === selected.id) : [];
   const referrer = selected?.referrerId ? customers.find((c) => c.id === selected?.referrerId) : null;
 
   const FIELD = "w-full px-2.5 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-400";
   const RO = "bg-gray-50 " + FIELD;
-  const isRO = mode === "view";
+  const isRO = mode === "view" || isAppUserSelected;
 
   const catFiltered = CUSTOMER_CATEGORIES.filter((c) =>
     !catSearch || c.toLowerCase().includes(catSearch.toLowerCase())
@@ -131,7 +175,8 @@ export default function CustomersPage() {
         <div>
           <h1 className="text-xl font-bold">고객자료관리</h1>
           <p className="text-xs text-gray-500">
-            {customers.length}/{customers.length} &nbsp;·&nbsp; LastNo {lastNo} &nbsp;·&nbsp; 고객번호 {selected ? String(selected.no).padStart(4, "0") : "—"}
+            {loading ? "로딩 중..." : `${customers.length}/${customers.length}`} &nbsp;·&nbsp; LastNo {lastNo} &nbsp;·&nbsp; 고객번호 {selected ? (selected.no != null ? String(selected.no).padStart(4, "0") : "—") : "—"}
+            {isAppUserSelected && <span className="ml-2 px-1.5 py-0.5 rounded bg-green-100 text-green-700 text-xs">앱회원</span>}
           </p>
         </div>
         <div className="flex gap-1.5 text-xs">
@@ -261,6 +306,16 @@ export default function CustomersPage() {
                 </div>
               )}
 
+              {/* 앱회원 전용: 이메일, 마일리지, 이용 횟수 */}
+              {isAppUserSelected && selected && (
+                <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200 space-y-1 text-xs">
+                  <p className="font-semibold text-green-800">앱 회원 정보</p>
+                  {selected.email && <p>이메일: {selected.email}</p>}
+                  <p>마일리지 잔액: {(selected.mileageBalance ?? 0).toLocaleString()}원</p>
+                  <p>이용 횟수: {selected.rideCount ?? 0}회</p>
+                </div>
+              )}
+
               {/* 마일리지 */}
               <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                 {[
@@ -269,7 +324,7 @@ export default function CustomersPage() {
                   ["전체실적", (totalFare + referrals.length * 1000).toLocaleString()],
                   ["최근거래", customerRides.at(-1)?.date ?? "—"],
                   ["누적금액", totalFare.toLocaleString() + "원"],
-                  ["거래횟수", customerRides.length + "회"],
+                  ["거래횟수", (isAppUserSelected && selected?.rideCount != null) ? String(selected.rideCount) + "회" : customerRides.length + "회"],
                 ].map(([label, val]) => (
                   <div key={label} className="bg-gray-50 rounded p-1.5 border border-gray-200">
                     <p className="text-gray-500">{label}</p>
@@ -283,8 +338,8 @@ export default function CustomersPage() {
           {/* ─ 하단 버튼 ─ */}
           <div className="mt-2 flex flex-wrap gap-1.5">
             <BtnAction label="신규" shortcut="F2" color="blue" onClick={handleNew} />
-            <BtnAction label="수정" shortcut="F3" color="gray" onClick={handleEdit} disabled={!selected} />
-            <BtnAction label="삭제" shortcut="F4" color="red" onClick={handleDelete} disabled={!selected} />
+            <BtnAction label="수정" shortcut="F3" color="gray" onClick={handleEdit} disabled={!canEditDelete} />
+            <BtnAction label="삭제" shortcut="F4" color="red" onClick={handleDelete} disabled={!canEditDelete} />
             <BtnAction label="검색" shortcut="F5" color="gray" onClick={() => {}} />
             <BtnAction label="전체" shortcut="F7" color="gray" onClick={() => { setSearch(""); }} />
             <BtnAction label="저장" shortcut="F12" color="green" onClick={handleSave} disabled={isRO} />
@@ -313,26 +368,27 @@ export default function CustomersPage() {
           </div>
 
           {/* 당신이 추천한 고객명단 */}
-          <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 text-xs font-semibold text-gray-600">
+          <div className="sheet-wrap overflow-hidden">
+            <div className="px-3 py-2 border-b border-gray-200 text-xs font-semibold text-gray-600 bg-[var(--sheet-header-bg)]">
               당신이 추천한 고객명단 ({referrals.length}명)
             </div>
             <div className="overflow-x-auto max-h-36">
-              <table className="w-full text-xs">
-                <thead className="bg-gray-50 sticky top-0">
+              <table className="sheet-table w-full text-xs">
+                <thead className="sticky">
                   <tr>
                     {["고객번호","고객성명","고객정보","이용실적","최근거래일"].map((h) => (
-                      <th key={h} className="px-2 py-1.5 text-left border-b border-gray-200 text-gray-500">{h}</th>
+                      <th key={h} className="px-2 py-1.5 text-left">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody>
                   {referrals.length === 0 ? (
                     <tr><td colSpan={5} className="px-2 py-3 text-gray-300 text-center">없음</td></tr>
                   ) : referrals.map((r) => {
                     const rRides = rides.filter((rd) => (rd as any).customerId === r.id);
+                    const item = customers.find((c) => c.id === r.id);
                     return (
-                      <tr key={r.id} onClick={() => selectCustomer(r)} className="hover:bg-blue-50 cursor-pointer">
+                      <tr key={r.id} onClick={() => item && selectCustomer(item)} className="cursor-pointer">
                         <td className="px-2 py-1.5 text-gray-500">{String(r.no).padStart(4,"0")}</td>
                         <td className="px-2 py-1.5 font-medium">{r.name}</td>
                         <td className="px-2 py-1.5 text-gray-500">{r.info}</td>
@@ -347,24 +403,24 @@ export default function CustomersPage() {
           </div>
 
           {/* 운행 이력 */}
-          <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 text-xs font-semibold text-gray-600">
+          <div className="sheet-wrap overflow-hidden">
+            <div className="px-3 py-2 border-b border-gray-200 text-xs font-semibold text-gray-600 bg-[var(--sheet-header-bg)]">
               운행 이력 ({customerRides.length}건)
             </div>
             <div className="overflow-x-auto max-h-40">
-              <table className="w-full text-xs">
-                <thead className="bg-gray-50 sticky top-0">
+              <table className="sheet-table w-full text-xs">
+                <thead className="sticky">
                   <tr>
                     {["출발일자","접수시간","기사","운행요금","출발지","도착지","비고"].map((h) => (
-                      <th key={h} className="px-2 py-1.5 text-left border-b border-gray-200 text-gray-500">{h}</th>
+                      <th key={h} className="px-2 py-1.5 text-left">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody>
                   {customerRides.length === 0 ? (
                     <tr><td colSpan={7} className="px-2 py-3 text-gray-300 text-center">없음</td></tr>
                   ) : customerRides.map((r) => (
-                    <tr key={r.id} className="hover:bg-blue-50">
+                    <tr key={r.id}>
                       <td className="px-2 py-1.5 text-gray-500">{r.date}</td>
                       <td className="px-2 py-1.5 text-gray-500">{r.time}</td>
                       <td className="px-2 py-1.5">{r.driverName}</td>
@@ -380,38 +436,45 @@ export default function CustomersPage() {
           </div>
 
           {/* 고객 목록 */}
-          <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 text-xs font-semibold text-gray-600">
+          <div className="sheet-wrap overflow-hidden">
+            <div className="px-3 py-2 border-b border-gray-200 text-xs font-semibold text-gray-600 bg-[var(--sheet-header-bg)]">
               고객 목록 ({filtered.length}명)
             </div>
             <div className="overflow-x-auto max-h-64">
-              <table className="w-full text-xs">
-                <thead className="bg-gray-50 sticky top-0">
+              <table className="sheet-table w-full text-xs">
+                <thead className="sticky">
                   <tr>
-                    {["번호","분류","성명","연락처","주소","등록일"].map((h) => (
-                      <th key={h} className="px-2 py-1.5 text-left border-b border-gray-200 text-gray-500">{h}</th>
+                    {["구분","번호","분류","성명","연락처","주소","등록일"].map((h) => (
+                      <th key={h} className="px-2 py-1.5 text-left">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody>
                   {filtered.length === 0 ? (
-                    <tr><td colSpan={6} className="px-2 py-4 text-center text-gray-300">고객 없음</td></tr>
-                  ) : filtered.map((c) => (
+                    <tr><td colSpan={7} className="px-2 py-4 text-center text-gray-300">고객 없음</td></tr>
+                  ) : filtered.map((c) => {
+                    const isApp = c.source === "app_user";
+                    return (
                     <tr
                       key={c.id}
                       onClick={() => selectCustomer(c)}
-                      className={`cursor-pointer hover:bg-blue-50 transition ${selected?.id === c.id ? "bg-blue-100" : ""}`}
+                      className={`cursor-pointer ${selected?.id === c.id ? "sheet-selected" : ""}`}
                     >
-                      <td className="px-2 py-1.5 text-gray-500">{String(c.no).padStart(4,"0")}</td>
                       <td className="px-2 py-1.5">
-                        <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">{c.category}</span>
+                        <span className={`px-1.5 py-0.5 rounded text-xs ${isApp ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
+                          {isApp ? "앱회원" : "고객"}
+                        </span>
+                      </td>
+                      <td className="px-2 py-1.5 text-gray-500">{c.no != null ? String(c.no).padStart(4,"0") : "—"}</td>
+                      <td className="px-2 py-1.5">
+                        <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">{c.category || (isApp ? "앱회원" : "")}</span>
                       </td>
                       <td className="px-2 py-1.5 font-medium">{c.name}</td>
                       <td className="px-2 py-1.5 text-gray-500">{c.mobile || c.phone}</td>
                       <td className="px-2 py-1.5 text-gray-500 truncate max-w-28">{c.address}</td>
-                      <td className="px-2 py-1.5 text-gray-400">{c.registeredAt}</td>
+                      <td className="px-2 py-1.5 text-gray-400">{formatRegisteredAt(c.registeredAt)}</td>
                     </tr>
-                  ))}
+                  );})}
                 </tbody>
               </table>
             </div>
@@ -479,7 +542,7 @@ function BtnAction({ label, shortcut, color, onClick, disabled = false }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-3 py-1.5 rounded text-xs font-semibold transition ${colors[color]} disabled:opacity-40 disabled:cursor-not-allowed`}
+      className={`px-3 py-1.5 rounded text-xs font-semibold transition ${colors[color] ?? colors.gray} disabled:opacity-40 disabled:cursor-not-allowed`}
     >
       {label}<span className="ml-1 opacity-70 text-[10px]">[{shortcut}]</span>
     </button>

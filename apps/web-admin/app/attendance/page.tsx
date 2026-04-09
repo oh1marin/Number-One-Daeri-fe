@@ -162,11 +162,11 @@ export default function AttendancePage() {
       </div>
 
       {/* ─── 그리드 ─── */}
-      <div className="flex-1 overflow-auto bg-white">
-        <table className="border-collapse text-xs min-w-max">
-          <thead className="sticky top-0 z-10">
-            <tr className="bg-gray-200">
-              <th className="border border-gray-400 px-3 py-1.5 w-24 text-left font-medium text-gray-700 sticky left-0 bg-gray-200 z-20">성명</th>
+      <div className="flex-1 overflow-auto sheet-wrap">
+        <table className="sheet-table border-collapse text-xs min-w-max">
+          <thead className="sticky">
+            <tr>
+              <th className="px-3 py-1.5 w-24 text-left sticky left-0 z-20 bg-[var(--sheet-header-bg)]">성명</th>
               {dayList.map((d) => {
                 const dow = dayOfWeek(year, month, d);
                 const isToday = year === today.getFullYear() && month === today.getMonth() + 1 && d === today.getDate();
@@ -174,17 +174,17 @@ export default function AttendancePage() {
                 const isSat = dow === 6;
                 return (
                   <th key={d}
-                    className={`border border-gray-400 w-7 py-1.5 text-center font-medium
-                      ${isToday ? "bg-blue-800 text-white" : isSun ? "bg-red-100 text-red-600" : isSat ? "bg-blue-50 text-blue-600" : "text-gray-700"}`}>
+                    className={`w-7 py-1.5 text-center font-medium
+                      ${isToday ? "bg-blue-800 text-white" : isSun ? "bg-red-100 text-red-600" : isSat ? "bg-blue-50 text-blue-600" : ""}`}>
                     {String(d).padStart(2, "0")}
                   </th>
                 );
               })}
-              <th className="border border-gray-400 px-2 py-1.5 w-10 text-center text-yellow-700 font-bold bg-yellow-50">지각</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-10 text-center text-red-700 font-bold bg-red-50">결근</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-10 text-center text-green-700 font-bold bg-green-50">정상</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-10 text-center text-blue-700 font-bold bg-blue-50">휴무</th>
-              <th className="border border-gray-400 px-2 py-1.5 w-12 text-center text-gray-500 bg-gray-100">삭제</th>
+              <th className="px-2 py-1.5 w-10 text-center text-yellow-700 font-bold bg-yellow-50">지각</th>
+              <th className="px-2 py-1.5 w-10 text-center text-red-700 font-bold bg-red-50">결근</th>
+              <th className="px-2 py-1.5 w-10 text-center text-green-700 font-bold bg-green-50">정상</th>
+              <th className="px-2 py-1.5 w-10 text-center text-blue-700 font-bold bg-blue-50">휴무</th>
+              <th className="px-2 py-1.5 w-12 text-center text-gray-500 bg-gray-100">삭제</th>
             </tr>
           </thead>
           <tbody>
@@ -200,10 +200,9 @@ export default function AttendancePage() {
               const normalCount = countOf(driver.id, "0");
               const offCount = countOf(driver.id, "휴");
               return (
-                <tr key={driver.id}
-                  className={driverIdx % 2 === 0 ? "bg-yellow-50 hover:bg-yellow-100" : "bg-white hover:bg-gray-50"}>
+                <tr key={driver.id}>
                   {/* 성명 */}
-                  <td className={`border border-gray-300 px-2 py-1 font-bold text-gray-800 sticky left-0 z-10 ${driverIdx % 2 === 0 ? "bg-yellow-50" : "bg-white"}`}>
+                  <td className={`px-2 py-1 font-bold text-gray-800 sticky left-0 z-10 ${driverIdx % 2 === 0 ? "bg-[var(--sheet-row-even)]" : "bg-[var(--sheet-row-odd)]"}`}>
                     {driver.name}
                   </td>
 
@@ -219,7 +218,7 @@ export default function AttendancePage() {
                     return (
                       <td key={d}
                         onClick={() => handleCellClick(driver.id, driver.name, d)}
-                        className={`border border-gray-200 w-7 h-7 text-center cursor-pointer select-none relative
+                        className={`w-7 h-7 text-center cursor-pointer select-none relative
                           ${isToday ? "border-blue-400 border-2" : ""}
                           ${isSun ? "bg-red-50" : isSat ? "bg-blue-50" : ""}`}>
                         <span className={`absolute inset-0 flex items-center justify-center text-xs rounded-sm ${STATUS_STYLE[status]}`}>
@@ -239,11 +238,11 @@ export default function AttendancePage() {
                   })}
 
                   {/* 통계 */}
-                  <td className="border border-gray-300 px-1 py-1 text-center font-bold text-yellow-700 bg-yellow-50">{lateCount || 0}</td>
-                  <td className="border border-gray-300 px-1 py-1 text-center font-bold text-red-600 bg-red-50">{absentCount || 0}</td>
-                  <td className="border border-gray-300 px-1 py-1 text-center font-bold text-green-700 bg-green-50">{normalCount || 0}</td>
-                  <td className="border border-gray-300 px-1 py-1 text-center font-bold text-blue-600 bg-blue-50">{offCount || 0}</td>
-                  <td className="border border-gray-300 px-1 py-1 text-center bg-gray-50">
+                  <td className="px-1 py-1 text-center font-bold text-yellow-700 bg-yellow-50">{lateCount || 0}</td>
+                  <td className="px-1 py-1 text-center font-bold text-red-600 bg-red-50">{absentCount || 0}</td>
+                  <td className="px-1 py-1 text-center font-bold text-green-700 bg-green-50">{normalCount || 0}</td>
+                  <td className="px-1 py-1 text-center font-bold text-blue-600 bg-blue-50">{offCount || 0}</td>
+                  <td className="px-1 py-1 text-center bg-gray-50">
                     <button onClick={() => handleDeleteAll(driver.id, driver.name)}
                       className="text-red-400 hover:text-red-600 text-[10px] px-1 rounded hover:bg-red-50">
                       삭제

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { getRecords, deleteRecord, clearAllRecords } from "@/lib/store";
 import { RideRecord, SearchField } from "@/lib/types";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 const SEARCH_FIELDS: { value: SearchField; label: string }[] = [
   { value: "customerName", label: "고객명 및 업소명" },
@@ -63,59 +67,46 @@ export default function RidesPage() {
           <h1 className="text-2xl font-bold">콜 조회</h1>
           <p className="text-gray-500 text-sm mt-1">정보내역 조회창</p>
         </div>
-        <Link href="/rides/new" className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
-          + 콜 입력
-        </Link>
+        <Button asChild><Link href="/rides/new">+ 콜 입력</Link></Button>
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm p-5 mb-4">
+      <div className="sheet-panel">
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1.5">조회항목</label>
-            <select
-              value={field}
-              onChange={(e) => setField(e.target.value as SearchField)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
+            <Select value={field} onChange={(e) => setField(e.target.value as SearchField)}>
               {SEARCH_FIELDS.map((f) => (
                 <option key={f.value} value={f.value}>{f.label}</option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="flex-1 min-w-40">
             <label className="block text-xs font-medium text-gray-600 mb-1.5">검색어</label>
-            <input
+            <Input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="검색어를 입력하세요"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-          <div className="flex gap-2">
-            <button onClick={handleSearch} className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
-              조회하기
-            </button>
-            <button onClick={handleShowAll} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
-              전체보기
-            </button>
-            <button onClick={handleDeleteAll} className="px-4 py-2 bg-red-100 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-200 transition">
-              모든정보삭제
-            </button>
+          <div className="flex gap-2 items-end">
+            <Button onClick={handleSearch}>조회하기</Button>
+            <Button variant="secondary" onClick={handleShowAll}>전체보기</Button>
+            <Button variant="destructive" onClick={handleDeleteAll}>모든정보삭제</Button>
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-3">
           {showAll ? `전체 ${records.length}건` : `검색결과 ${filtered.length}건`}
-          {" · "}합계: <span className="font-semibold text-blue-600">{totalSum.toLocaleString()}원</span>
+          {" · "}합계: <Badge className="ml-1">{totalSum.toLocaleString()}원</Badge>
         </p>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="sheet-wrap overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-50 text-gray-500 uppercase">
+          <table className="sheet-table">
+            <thead>
               <tr>
                 <th className="px-3 py-3 text-left">고객명 및 업소명</th>
                 <th className="px-3 py-3 text-left">연락처</th>
@@ -132,7 +123,7 @@ export default function RidesPage() {
                 <th className="px-3 py-3 text-center">삭제</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={13} className="px-4 py-10 text-center text-gray-400">
@@ -141,7 +132,7 @@ export default function RidesPage() {
                 </tr>
               ) : (
                 filtered.map((r) => (
-                  <tr key={r.id} className="hover:bg-gray-50 transition">
+                  <tr key={r.id}>
                     <td className="px-3 py-2.5 font-medium">{r.customerName}</td>
                     <td className="px-3 py-2.5 text-gray-500">{r.phone}</td>
                     <td className="px-3 py-2.5 text-gray-500">{r.date}</td>
@@ -155,19 +146,16 @@ export default function RidesPage() {
                     <td className="px-3 py-2.5 text-right font-bold text-blue-600">{r.total.toLocaleString()}</td>
                     <td className="px-3 py-2.5 text-gray-400">{r.note}</td>
                     <td className="px-3 py-2.5 text-center">
-                      <button
-                        onClick={() => handleDelete(r.id)}
-                        className="px-2 py-1 text-red-500 hover:bg-red-50 rounded text-xs"
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(r.id)} className="text-red-500 hover:text-red-700 hover:bg-red-50 h-7 px-2">
                         삭제
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
             {filtered.length > 0 && (
-              <tfoot className="bg-gray-50 font-bold text-sm">
+              <tfoot>
                 <tr>
                   <td colSpan={7} className="px-3 py-3 text-gray-600">합 계</td>
                   <td className="px-3 py-3 text-right">{filtered.reduce((s, r) => s + r.fare, 0).toLocaleString()}</td>

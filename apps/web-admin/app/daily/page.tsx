@@ -147,7 +147,7 @@ export default function DailyPage() {
             </button>
           ))}
           <Link href="/drivers"
-            className="flex items-center gap-1 px-2.5 py-1 bg-white border border-gray-400 rounded text-xs hover:bg-gray-50 shadow-sm">
+            className="flex items-center gap-1 px-2.5 py-1 bg-white border border-gray-400 rounded text-xs hover:bg-gray-50 shadow-sm inline-block">
             👤 기사님 현황
           </Link>
         </div>
@@ -258,12 +258,12 @@ export default function DailyPage() {
       </div>
 
       {/* ─── 운행 목록 테이블 ─── */}
-      <div className="flex-1 overflow-auto bg-white">
-        <table className="w-full text-xs border-collapse">
-          <thead className="sticky top-0 bg-gray-200">
+      <div className="flex-1 overflow-auto sheet-wrap">
+        <table className="sheet-table w-full text-xs">
+          <thead className="sticky">
             <tr>
               {["고객번호","고객명","고객정보","접수시간","비고","출발일자","출발","출발지","도착","도착지","운행요금","기사님","업소명"].map((h) => (
-                <th key={h} className="border border-gray-400 px-2 py-1.5 text-left font-medium text-gray-700 whitespace-nowrap">{h}</th>
+                <th key={h} className="px-2 py-1.5 text-left whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -279,23 +279,22 @@ export default function DailyPage() {
               const isSelected = selected?.id === r.id;
               return (
                 <tr key={r.id} onClick={() => setSelected(isSelected ? null : r)}
-                  className={`cursor-pointer border-b border-gray-200 transition
-                    ${isSelected ? "bg-blue-800 text-white" : i % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50 hover:bg-blue-100"}`}>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{cust?.no ?? ""}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5 font-medium">{r.customerName}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{cust?.info ?? ""}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{r.time}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{r.note}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{r.date}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{r.time}</td>
-                  <td className={`border-r border-gray-200 px-2 py-1.5 font-medium ${isSelected ? "" : "text-blue-700"}`}>{r.pickup}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5"></td>
-                  <td className={`border-r border-gray-200 px-2 py-1.5 font-medium ${isSelected ? "" : "text-red-600"}`}>{r.dropoff}</td>
-                  <td className="border-r border-gray-200 px-2 py-1.5 text-right">{r.total.toLocaleString()}</td>
-                  <td className={`border-r border-gray-200 px-2 py-1.5 font-bold ${isSelected ? "" : "text-green-700"}`}>
+                  className={`cursor-pointer ${isSelected ? "sheet-selected" : ""}`}>
+                  <td className="px-2 py-1.5">{cust?.no ?? ""}</td>
+                  <td className="px-2 py-1.5 font-medium">{r.customerName}</td>
+                  <td className="px-2 py-1.5">{cust?.info ?? ""}</td>
+                  <td className="px-2 py-1.5">{r.time}</td>
+                  <td className="px-2 py-1.5">{r.note}</td>
+                  <td className="px-2 py-1.5">{r.date}</td>
+                  <td className="px-2 py-1.5">{r.time}</td>
+                  <td className={`px-2 py-1.5 font-medium ${isSelected ? "" : "text-blue-700"}`}>{r.pickup}</td>
+                  <td className="px-2 py-1.5"></td>
+                  <td className={`px-2 py-1.5 font-medium ${isSelected ? "" : "text-red-600"}`}>{r.dropoff}</td>
+                  <td className="px-2 py-1.5 text-right">{r.total.toLocaleString()}</td>
+                  <td className={`px-2 py-1.5 font-bold ${isSelected ? "" : "text-green-700"}`}>
                     {r.driverName || <span className="text-gray-300">미배정</span>}
                   </td>
-                  <td className="border-r border-gray-200 px-2 py-1.5">{cust?.info ?? ""}</td>
+                  <td className="px-2 py-1.5">{cust?.info ?? ""}</td>
                 </tr>
               );
             })}
@@ -314,7 +313,7 @@ export default function DailyPage() {
               setOrderForm({ customerName: selected.customerName, phone: selected.phone, date: selected.date, time: selected.time, driverName: selected.driverName, pickup: selected.pickup, dropoff: selected.dropoff, fare: selected.fare, discount: selected.discount, extra: selected.extra, note: selected.note });
               setEditMode(true); setShowOrderForm(true);
             }} />
-          <DailyBtn icon="🚗" label="기사 지정작업" shortcut="F5" color="amber"
+          <DailyBtn icon="🚗" label="기사 지정작업" shortcut="F5" color="orange"
             onClick={() => {
               if (!selected) { alert("오더를 먼저 선택하세요."); return; }
               setSelectedDriver(null); setDriverSearch(""); setShowDriverModal(true);
@@ -331,7 +330,7 @@ export default function DailyPage() {
             onClick={handleCancelOrder} />
           <DailyBtn icon="📊" label="기사 운행이력" shortcut="F6" color="gray"
             onClick={() => window.open(`/drivers`, "_blank")} />
-          <DailyBtn icon="📍" label="목적지 도착처리" shortcut="F8" color="teal"
+          <DailyBtn icon="📍" label="목적지 도착처리" shortcut="F8" color="blue"
             onClick={handleArrival} />
           <DailyBtn icon="🔍" label="접수고객 검색" shortcut="F0" color="gray"
             onClick={() => {}} />
@@ -570,13 +569,11 @@ function DailyBtn({ icon, label, shortcut, color, onClick }: {
     gray: "bg-gray-500 hover:bg-gray-600 text-white",
     red: "bg-red-500 hover:bg-red-600 text-white",
     green: "bg-green-600 hover:bg-green-700 text-white",
-    teal: "bg-teal-600 hover:bg-teal-700 text-white",
     orange: "bg-orange-500 hover:bg-orange-600 text-white",
-    amber: "bg-amber-500 hover:bg-amber-600 text-white",
   };
   return (
     <button onClick={onClick}
-      className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-semibold shadow-sm transition ${colors[color]}`}>
+      className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-semibold transition ${colors[color] ?? colors.gray}`}>
       <span>{icon}</span>
       <span>{label}</span>
       <span className="opacity-60 text-[10px]">[{shortcut}]</span>

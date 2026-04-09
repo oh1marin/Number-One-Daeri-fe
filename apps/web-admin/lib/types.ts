@@ -5,6 +5,34 @@ export const CUSTOMER_CATEGORIES = [
 
 export type CustomerCategory = (typeof CUSTOMER_CATEGORIES)[number] | string;
 
+/** 통합 고객 목록 항목 (Customer + 앱 회원) */
+export interface CustomerListItem {
+  id: string;
+  source: "customer" | "app_user";
+  no: number | null;
+  registeredAt: string;
+  category: string;
+  name: string;
+  phone?: string;
+  mobile?: string;
+  address?: string;
+  addressDetail?: string;
+  info?: string;
+  dmSend?: boolean;
+  smsSend?: boolean;
+  otherPhone?: string;
+  email?: string;
+  mileageBalance?: number;
+  rideCount?: number;
+  /** 1차추천인 수 (추천 쿠폰 관리/통계에서 사용될 수 있음) */
+  referrer1Count?: number;
+  /** 2차추천인 수 (필요 시 사용) */
+  referrer2Count?: number;
+  referrerId?: string;
+  memberNo?: string;
+  notes?: string;
+}
+
 export interface Customer {
   id: string;
   no: number;               // 고객번호

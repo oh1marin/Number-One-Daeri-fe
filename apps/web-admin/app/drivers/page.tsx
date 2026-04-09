@@ -128,11 +128,11 @@ export default function DriversPage() {
       </div>
 
       {/* ─── 상단 목록 ─── */}
-      <div className="bg-white border border-gray-400 rounded-lg overflow-hidden mb-3">
+      <div className="sheet-wrap overflow-hidden mb-3">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="sheet-table w-full text-xs">
             <thead>
-              <tr className="bg-gray-200 text-gray-700">
+              <tr>
                 {[
                   ["no","관리번호"], ["registeredAt","등록일자"], ["name","성명"],
                   ["region","담당지역"], ["timeSlot","시간대"], ["phone","전화번호"],
@@ -140,7 +140,7 @@ export default function DriversPage() {
                 ].map(([key, label]) => (
                   <th key={key}
                     onClick={() => setSortKey(key as SortKey)}
-                    className={`px-2 py-2 text-left border border-gray-300 cursor-pointer hover:bg-gray-300 whitespace-nowrap select-none ${sortKey === key ? "bg-amber-100" : ""}`}>
+                    className={`px-2 py-2 text-left cursor-pointer hover:opacity-90 whitespace-nowrap select-none ${sortKey === key ? "bg-blue-100" : ""}`}>
                     {label}{sortKey === key ? " ▲" : ""}
                   </th>
                 ))}
@@ -152,18 +152,17 @@ export default function DriversPage() {
               ) : filtered.map((d, i) => (
                 <tr key={d.id}
                   onClick={() => selectDriver(d, i)}
-                  className={`cursor-pointer border-b border-gray-100 transition
-                    ${selected?.id === d.id ? "bg-blue-900 text-white" : i % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-yellow-50 hover:bg-blue-50"}`}>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.no}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.registeredAt}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100 font-medium">{d.name}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.region}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.timeSlot}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.phone}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.mobile}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.licenseNo}</td>
-                  <td className="px-2 py-1.5 border-r border-gray-100">{d.aptitudeTest}</td>
-                  <td className="px-2 py-1.5">{d.residentNo ? d.residentNo.slice(0, 6) + "-" + d.residentNo.slice(6, 7) + "XXXXXX" : ""}</td>
+                  className={`cursor-pointer ${selected?.id === d.id ? "sheet-selected" : ""}`}>
+                  <td>{d.no}</td>
+                  <td>{d.registeredAt}</td>
+                  <td className="font-medium">{d.name}</td>
+                  <td>{d.region}</td>
+                  <td>{d.timeSlot}</td>
+                  <td>{d.phone}</td>
+                  <td>{d.mobile}</td>
+                  <td>{d.licenseNo}</td>
+                  <td>{d.aptitudeTest}</td>
+                  <td>{d.residentNo ? d.residentNo.slice(0, 6) + "-" + d.residentNo.slice(6, 7) + "XXXXXX" : ""}</td>
                 </tr>
               ))}
             </tbody>
@@ -174,7 +173,7 @@ export default function DriversPage() {
       {/* ─── 하단 폼 ─── */}
       <div className="flex gap-3 flex-1 min-h-0">
         {/* 자료조회 폼 */}
-        <div className="bg-white border border-gray-400 rounded-lg p-4 flex-1 min-w-0">
+        <div className="sheet-panel flex-1 min-w-0">
           {/* 폼 헤더 */}
           <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
             <span className="text-xs font-bold text-gray-600">자료조회</span>
@@ -370,7 +369,7 @@ export default function DriversPage() {
         <BtnAction label="검색" shortcut="F5" color="gray" onClick={() => {}} />
         <BtnAction label="정렬" shortcut="F6" color="gray" onClick={() => setSortKey("name")} />
         <BtnAction label="문자메세지" shortcut="F7" color="gray" onClick={() => selected && alert(`${selected.name} (${selected.mobile || selected.phone})에게 문자 발송`)} disabled={!selected} />
-        <BtnAction label="자료출력" shortcut="F9" color="teal" onClick={() => window.print()} disabled={!selected} />
+        <BtnAction label="자료출력" shortcut="F9" color="blue" onClick={() => window.print()} disabled={!selected} />
         <BtnAction label="운행이력" shortcut="F11" color="green" onClick={() => setShowHistory(true)} disabled={!selected} />
         <BtnAction label="작업완료" shortcut="Esc" color="orange" onClick={handleNew} />
       </div>
@@ -442,12 +441,11 @@ function BtnAction({ label, shortcut, color, onClick, disabled = false }: {
     gray: "bg-gray-500 hover:bg-gray-600 text-white",
     red: "bg-red-500 hover:bg-red-600 text-white",
     green: "bg-green-600 hover:bg-green-700 text-white",
-    teal: "bg-teal-600 hover:bg-teal-700 text-white",
     orange: "bg-orange-500 hover:bg-orange-600 text-white",
   };
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`px-3 py-1.5 rounded text-xs font-semibold transition ${colors[color]} disabled:opacity-40 disabled:cursor-not-allowed`}>
+      className={`px-3 py-1.5 rounded text-xs font-semibold transition ${colors[color] ?? colors.gray} disabled:opacity-40 disabled:cursor-not-allowed`}>
       {label} <span className="opacity-70">[{shortcut}]</span>
     </button>
   );

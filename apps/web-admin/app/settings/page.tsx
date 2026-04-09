@@ -111,16 +111,16 @@ export default function SettingsPage() {
             <table className="border-collapse text-xs text-center">
               <thead>
                 <tr>
-                  <th className="border border-gray-200 bg-amber-100 px-3 py-2 w-20">출발↓ 도착→</th>
+                  <th className="border border-gray-200 bg-blue-50 px-3 py-2 w-20">출발↓ 도착→</th>
                   {areas.map((a) => (
-                    <th key={a} className="border border-gray-200 bg-amber-100 px-3 py-2 min-w-20">{a}</th>
+                    <th key={a} className="border border-gray-200 bg-blue-50 px-3 py-2 min-w-20">{a}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {areas.map((from) => (
                   <tr key={from}>
-                    <td className="border border-gray-200 bg-amber-50 px-3 py-2 font-medium">{from}</td>
+                    <td className="border border-gray-200 bg-blue-50 px-3 py-2 font-medium">{from}</td>
                     {areas.map((to) => (
                       <td key={to} className="border border-gray-200 p-0">
                         {from === to ? (
