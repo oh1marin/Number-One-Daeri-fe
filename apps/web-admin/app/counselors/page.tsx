@@ -38,9 +38,11 @@ export default function CounselorsPage() {
       return;
     }
     try {
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/admin/counselors`, {
         credentials: "include",
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
       });
       if (res.ok) {
         const data = await res.json();
@@ -87,6 +89,8 @@ export default function CounselorsPage() {
     }
     setSaving(true);
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
       const body = {
         name: form.name.trim(),
         cid: form.cid.trim() || null,
@@ -107,10 +111,7 @@ export default function CounselorsPage() {
       const res = await fetch(`${API_BASE}/admin/counselors`, {
         credentials: "include",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify(body),
       });
       if (!res.ok) {

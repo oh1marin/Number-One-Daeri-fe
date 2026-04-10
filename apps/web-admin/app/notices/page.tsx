@@ -77,9 +77,11 @@ export default function NoticesPage() {
       return;
     }
     try {
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/admin/notices`, {
         credentials: "include",
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
       });
       if (res.ok) {
         const data = await res.json();
@@ -101,12 +103,13 @@ export default function NoticesPage() {
 
   const api = (path: string, opts: RequestInit = {}) => {
     const token = getAccessToken();
+    const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
     return fetch(`${API_BASE}${path}`, {
       credentials: "include",
       ...opts,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...authHeader,
         ...opts.headers,
       },
     });

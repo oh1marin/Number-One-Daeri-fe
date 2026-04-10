@@ -27,9 +27,11 @@ export default function MileageHistoryPage() {
       try {
         const params = new URLSearchParams({ page: String(page), limit: String(limit) });
         if (userId) params.set("userId", userId);
+        const headers: Record<string, string> = {};
+        if (token) headers.Authorization = `Bearer ${token}`;
         const res = await fetch(`${API_BASE}/admin/mileage/history?${params}`, {
           credentials: "include",
-          headers: { Authorization: `Bearer ${token}` },
+          headers,
         });
         if (res.ok) {
           const data = await res.json();
