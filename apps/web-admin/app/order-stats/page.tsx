@@ -51,9 +51,11 @@ export default function OrderStatsPage() {
     }
     setLoading(true);
     try {
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/admin/order-stats`, {
         credentials: "include",
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
       });
       if (res.ok) {
         const data = await res.json();

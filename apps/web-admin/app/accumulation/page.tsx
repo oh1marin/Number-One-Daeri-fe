@@ -28,11 +28,13 @@ export default function AccumulationPage() {
         setLoading(false);
         return;
       }
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
       for (const path of ENDPOINTS) {
         try {
           const res = await fetch(`${API_BASE}${path}`, {
             credentials: "include",
-            headers: { Authorization: `Bearer ${token}` },
+            headers,
           });
           if (res.ok) {
             const data = await res.json();
@@ -63,6 +65,8 @@ export default function AccumulationPage() {
     if (!API_BASE || !hasAdminWebSession()) return;
     setSaving(true);
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
       const body = {
         rideEarnRate: settings.rideEarnRate,
         cardPercent: settings.cardPercent,
@@ -77,10 +81,7 @@ export default function AccumulationPage() {
         res = await fetch(`${API_BASE}${path}`, {
           credentials: "include",
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers,
           body: JSON.stringify(body),
         });
         if (res.ok) break;

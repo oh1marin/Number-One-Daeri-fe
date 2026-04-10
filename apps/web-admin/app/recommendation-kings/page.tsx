@@ -95,9 +95,11 @@ export default function RecommendationKingsPage() {
         month: String(month),
         limit: String(Math.min(100, Math.max(1, limit))),
       });
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/admin/recommendation-kings?${q}`, {
         credentials: "include",
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {

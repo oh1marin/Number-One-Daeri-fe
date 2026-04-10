@@ -177,11 +177,12 @@ export default function PromoListPage() {
 
   const apiFetch = async (url: string, opts: RequestInit) => {
     const token = getAccessToken();
+    const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
     return fetch(url, {
       ...opts,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token ?? ""}`,
+        ...authHeader,
         ...(opts.headers as object),
       },
     });

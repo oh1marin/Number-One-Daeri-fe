@@ -21,9 +21,11 @@ export default function MileageErrorsPage() {
         return;
       }
       try {
+        const headers: Record<string, string> = {};
+        if (token) headers.Authorization = `Bearer ${token}`;
         const res = await fetch(`${API_BASE}/admin/mileage/errors`, {
-        credentials: "include",
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+          headers,
         });
         if (res.ok) {
           const data = await res.json();

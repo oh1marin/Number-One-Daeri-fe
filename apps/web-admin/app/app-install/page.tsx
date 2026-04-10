@@ -83,9 +83,11 @@ export default function AppInstallPage() {
       const params = new URLSearchParams({ page: String(page), limit: String(limit) });
       if (search) params.set("search", search);
       if (filter) params.set("filter", filter);
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/admin/app-install?${params}`, {
         credentials: "include",
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
       });
       if (res.ok) {
         const data = await res.json();
@@ -134,11 +136,12 @@ export default function AppInstallPage() {
 
   const apiFetch = async (url: string, opts: RequestInit = {}) => {
     const token = getAccessToken();
+    const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
     return fetch(url, {
       ...opts,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...authHeader,
         ...opts.headers,
       },
     });

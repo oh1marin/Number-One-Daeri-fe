@@ -22,9 +22,11 @@ export default function UsageGuidePage() {
         return;
       }
       try {
+        const headers: Record<string, string> = {};
+        if (token) headers.Authorization = `Bearer ${token}`;
         const res = await fetch(`${API_BASE}/admin/usage-guide`, {
           credentials: "include",
-          headers: { Authorization: `Bearer ${token}` },
+          headers,
         });
         if (res.ok) {
           const data = await res.json();
@@ -45,13 +47,12 @@ export default function UsageGuidePage() {
     if (!API_BASE || !hasAdminWebSession()) return;
     setSaving(true);
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/admin/usage-guide`, {
         credentials: "include",
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({ content }),
       });
       if (res.ok) {
