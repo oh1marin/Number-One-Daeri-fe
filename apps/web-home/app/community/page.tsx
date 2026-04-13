@@ -25,24 +25,30 @@ export default async function CommunityPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-16">
         <section>
-          <div className="divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden bg-white">
-            {notices.map((n) => (
-              <Link
-                key={n.id}
-                href={`/community/${n.id}`}
-                className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition"
-              >
-                <span className={`px-2 py-0.5 text-xs font-semibold rounded-full flex-shrink-0 ${n.badgeColor}`}>
-                  {n.badge}
-                </span>
-                <p className="flex-1 font-medium text-sm truncate">{n.title}</p>
-                <div className="flex-shrink-0 text-xs text-gray-400 flex items-center gap-3">
-                  <span>👁 {n.views.toLocaleString()}</span>
-                  <span>{n.date}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {notices.length === 0 ? (
+            <div className="border border-gray-100 rounded-2xl bg-white px-6 py-16 text-center text-gray-500 text-sm">
+              등록된 공지가 없습니다.
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden bg-white">
+              {notices.map((n) => (
+                <Link
+                  key={n.id}
+                  href={`/community/${n.id}`}
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition"
+                >
+                  <span className={`px-2 py-0.5 text-xs font-semibold rounded-full flex-shrink-0 ${n.badgeColor}`}>
+                    {n.badge}
+                  </span>
+                  <p className="flex-1 font-medium text-sm truncate">{n.title}</p>
+                  <div className="flex-shrink-0 text-xs text-gray-400 flex items-center gap-3">
+                    <span>👁 {n.views.toLocaleString()}</span>
+                    <span>{n.date}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </>

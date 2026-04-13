@@ -119,50 +119,90 @@ export function getNoticeById(id: number): Notice | undefined {
   return NOTICES.find((n) => n.id === id);
 }
 
-/** API에서 공지 목록 조회. 실패 시 정적 NOTICES 사용 */
+function extractNoticeList(data: unknown): unknown[] | null {
+  if (data == null) return null;
+  if (Array.isArray(data)) return data;
+  if (typeof data !== "object") return null;
+  const o = data as Record<string, unknown>;
+
+  const nested = o.data;
+  if (Array.isArray(nested)) return nested;
+  if (nested && typeof nested === "object") {
+    const d = nested as Record<string, unknown>;
+    for (const key of ["items", "notices", "list", "results"] as const) {
+      const v = d[key];
+      if (Array.isArray(v)) return v;
+    }
+  }
+
+  for (const key of ["items", "notices", "list", "results"] as const) {
+    const v = o[key];
+    if (Array.isArray(v)) return v;
+  }
+
+  return null;
+}
+
+function mapNoticeRow(r: Record<string, unknown>): Notice {
+  return {
+    id:
+      typeof r.id === "string" || typeof r.id === "number"
+        ? r.id
+        : r.id != null
+          ? String(r.id)
+          : 0,
+    badge: String(r.badge ?? "공지"),
+    badgeColor: String(r.badgeColor ?? "bg-red-100 text-red-600"),
+    title: String(r.title ?? ""),
+    date: String(r.date ?? ""),
+    views: Number(r.views ?? 0),
+    content: String(r.content ?? ""),
+    coverImageUrl:
+      typeof r.coverImageUrl === "string" && r.coverImageUrl.trim()
+        ? r.coverImageUrl.trim()
+        : undefined,
+    events: (Array.isArray(r.events) ? r.events : []).map((e: Record<string, unknown>) => ({
+      title: String(e.title ?? ""),
+      date: String(e.date ?? ""),
+      desc: String(e.desc ?? ""),
+      imageUrl:
+        typeof e.imageUrl === "string" && e.imageUrl.trim() ? e.imageUrl.trim() : undefined,
+    })),
+  };
+}
+
+/**
+ * API에서 공지 목록 조회.
+ * - 성공 시(배열로 파싱됨)에는 빈 배열이어도 그대로 반환(더 이상 샘플 NOTICES로 덮어쓰지 않음)
+ * - API 미설정·오류·응답 형식 불가 시에만 정적 NOTICES 폴백
+ */
 export async function fetchNotices(): Promise<Notice[]> {
   if (!process.env.NEXT_PUBLIC_API_BASE_URL?.trim()) return NOTICES;
+
   const apiV1 = getApiV1Base();
+  const urls = [`${apiV1}/notices`, `${apiV1}/public/notices`];
+
   try {
-    const urls = [`${apiV1}/notices`];
     for (const url of urls) {
-      const res = await fetch(url, { next: { revalidate: 60 } });
-      if (res.ok) {
-        const data = await res.json();
-        const raw = data?.data?.items ?? data?.data ?? data?.items ?? data;
-        const list = Array.isArray(raw) ? raw : [];
-        if (list.length > 0) {
-          return list.map((r: Record<string, unknown>) => ({
-            id:
-              typeof r.id === "string" || typeof r.id === "number"
-                ? r.id
-                : r.id != null
-                  ? String(r.id)
-                  : 0,
-            badge: String(r.badge ?? "공지"),
-            badgeColor: String(r.badgeColor ?? "bg-red-100 text-red-600"),
-            title: String(r.title ?? ""),
-            date: String(r.date ?? ""),
-            views: Number(r.views ?? 0),
-            content: String(r.content ?? ""),
-            coverImageUrl:
-              typeof r.coverImageUrl === "string" && r.coverImageUrl.trim()
-                ? r.coverImageUrl.trim()
-                : undefined,
-            events: (Array.isArray(r.events) ? r.events : []).map((e: Record<string, unknown>) => ({
-              title: String(e.title ?? ""),
-              date: String(e.date ?? ""),
-              desc: String(e.desc ?? ""),
-              imageUrl:
-                typeof e.imageUrl === "string" && e.imageUrl.trim() ? e.imageUrl.trim() : undefined,
-            })),
-          }));
-        }
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) continue;
+
+      let data: unknown;
+      try {
+        data = await res.json();
+      } catch {
+        continue;
       }
+
+      const list = extractNoticeList(data);
+      if (list === null) continue;
+
+      return list.map((row) => mapNoticeRow(row as Record<string, unknown>));
     }
   } catch {
-    // ignore
+    // 네트워크 등
   }
+
   return NOTICES;
 }
 
