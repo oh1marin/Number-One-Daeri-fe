@@ -1,4 +1,4 @@
-import { getApiV1Base } from "./apiBase";
+import { getApiOriginWithoutV1, getApiV1Base, isAbsoluteHttpUrl } from "./apiBase";
 
 export interface NoticeEvent {
   title: string;
@@ -177,10 +177,20 @@ function mapNoticeRow(r: Record<string, unknown>): Notice {
  * - API 미설정·오류·응답 형식 불가 시에만 정적 NOTICES 폴백
  */
 export async function fetchNotices(): Promise<Notice[]> {
-  if (!process.env.NEXT_PUBLIC_API_BASE_URL?.trim()) return NOTICES;
+  const rawEnv = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  if (!rawEnv) return NOTICES;
+  // 상대 경로(`/api/v1`)만 있으면 web-home에는 리라이트가 없어 백엔드로 안 나감 → 샘플 폴백
+  if (!isAbsoluteHttpUrl(rawEnv)) return NOTICES;
 
   const apiV1 = getApiV1Base();
-  const urls = [`${apiV1}/notices`, `${apiV1}/public/notices`];
+  const origin = getApiOriginWithoutV1();
+  const urls = Array.from(
+    new Set([
+      `${apiV1}/notices`,
+      `${origin}/notices`,
+      `${apiV1}/public/notices`,
+    ])
+  );
 
   try {
     for (const url of urls) {
