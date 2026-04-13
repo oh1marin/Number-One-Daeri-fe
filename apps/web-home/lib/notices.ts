@@ -1,4 +1,9 @@
-import { getApiOriginWithoutV1, getApiV1Base, isAbsoluteHttpUrl } from "./apiBase";
+import {
+  getApiOriginWithoutV1,
+  getApiV1Base,
+  getServerApiBaseRaw,
+  isAbsoluteHttpUrl,
+} from "./apiBase";
 
 export interface NoticeEvent {
   title: string;
@@ -176,8 +181,10 @@ function mapNoticeRow(r: Record<string, unknown>): Notice {
  * - 성공 시(배열로 파싱됨)에는 빈 배열이어도 그대로 반환(더 이상 샘플 NOTICES로 덮어쓰지 않음)
  * - API 미설정·오류·응답 형식 불가 시에만 정적 NOTICES 폴백
  */
+const NOTICES_QS = "limit=50";
+
 export async function fetchNotices(): Promise<Notice[]> {
-  const rawEnv = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  const rawEnv = getServerApiBaseRaw();
   if (!rawEnv) return NOTICES;
   // 상대 경로(`/api/v1`)만 있으면 web-home에는 리라이트가 없어 백엔드로 안 나감 → 샘플 폴백
   if (!isAbsoluteHttpUrl(rawEnv)) return NOTICES;
@@ -186,15 +193,18 @@ export async function fetchNotices(): Promise<Notice[]> {
   const origin = getApiOriginWithoutV1();
   const urls = Array.from(
     new Set([
-      `${apiV1}/notices`,
-      `${origin}/notices`,
-      `${apiV1}/public/notices`,
+      `${apiV1}/notices?${NOTICES_QS}`,
+      `${origin}/notices?${NOTICES_QS}`,
+      `${apiV1}/public/notices?${NOTICES_QS}`,
     ])
   );
 
   try {
     for (const url of urls) {
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: { Accept: "application/json" },
+      });
       if (!res.ok) continue;
 
       let data: unknown;
