@@ -1,9 +1,0 @@
-# 의존성 업데이트 PR 자동 생성 (GitHub 기능 — 별도 마켓플레이스 플러그인 불필요)
-# 저장소 Settings → Code security and analysis → Dependabot alerts 켜기
-version: 2
-updates:
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
