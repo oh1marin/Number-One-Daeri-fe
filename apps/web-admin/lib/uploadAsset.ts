@@ -96,9 +96,8 @@ export async function presignAndUploadImage(
 
   const presignJson = (await presignRes.json().catch(() => ({}))) as Record<string, unknown>;
   if (!presignRes.ok) {
-    const msg =
-      String(presignJson.message ?? presignJson.error ?? presignRes.statusText || "") ||
-      "Presign 요청 실패";
+    const piece = presignJson.message ?? presignJson.error ?? presignRes.statusText ?? "";
+    const msg = String(piece).trim() || "Presign 요청 실패";
     throw new Error(`${presignRes.status}: ${msg}`);
   }
 
