@@ -41,21 +41,24 @@ function KakaoMapWithKey() {
 
   if (error) {
     return (
-      <a
-        href={links.search}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block h-[480px] bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:opacity-90 transition"
-      >
-        <div className="h-full flex flex-col items-center justify-center text-gray-600">
+      <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-[480px] flex flex-col bg-gray-100">
+        <a
+          href={links.search}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex flex-col items-center justify-center text-gray-600 hover:opacity-90 transition px-4"
+        >
           <div className="mb-3">{MapFallbackIcon}</div>
           <p className="font-medium text-gray-700 mb-1">카카오맵에서 보기</p>
-          <p className="text-sm text-gray-500">{ADDRESS}</p>
+          <p className="text-sm text-gray-500 text-center">{ADDRESS}</p>
+          <p className="mt-2 text-xs text-amber-800 text-center max-w-sm">
+            임베드 지도가 안 뜨면 카카오 개발자 콘솔 → 앱 → 플랫폼 → Web에 이 사이트 도메인(예: Vercel 주소)을 등록했는지 확인하세요.
+          </p>
           <p className="mt-3 px-4 py-2 bg-yellow-400 text-yellow-900 text-sm font-semibold rounded-lg">
             지도 열기
           </p>
-        </div>
-      </a>
+        </a>
+      </div>
     );
   }
 
@@ -118,8 +121,10 @@ function KakaoMapWithKey() {
 
   return (
     <>
-      <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-[480px] relative">
-        <MapContent />
+      <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-[480px] relative flex flex-col">
+        <div className="flex-1 min-h-0 relative w-full">
+          <MapContent />
+        </div>
         <button
           type="button"
           onClick={() => setIsFullscreen(true)}
@@ -127,7 +132,7 @@ function KakaoMapWithKey() {
         >
           전체화면
         </button>
-        <div className="flex divide-x divide-gray-200 bg-white border-t">
+        <div className="flex divide-x divide-gray-200 bg-white border-t shrink-0">
           <a
             href={links.map}
             target="_blank"
@@ -159,7 +164,7 @@ function KakaoMapWithKey() {
               닫기
             </button>
           </div>
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 relative w-full">
             <MapContent interactive />
           </div>
         </div>
@@ -176,11 +181,14 @@ function FallbackLink() {
         href={links.search}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex-1 flex flex-col items-center justify-center text-gray-600 hover:opacity-90 transition"
+        className="flex-1 flex flex-col items-center justify-center text-gray-600 hover:opacity-90 transition px-4"
       >
         <div className="mb-3">{MapFallbackIcon}</div>
         <p className="font-medium text-gray-700 mb-1">카카오맵에서 보기</p>
-        <p className="text-sm text-gray-500">{ADDRESS}</p>
+        <p className="text-sm text-gray-500 text-center">{ADDRESS}</p>
+        <p className="mt-2 text-xs text-amber-800 text-center max-w-sm">
+          배포 사이트에서는 Vercel 환경 변수에 NEXT_PUBLIC_KAKAO_MAP_KEY(JavaScript 키)를 넣고, 값을 바꾼 뒤에는 반드시 다시 배포해야 합니다.
+        </p>
       </a>
       <div className="flex border-t border-gray-200">
         <a

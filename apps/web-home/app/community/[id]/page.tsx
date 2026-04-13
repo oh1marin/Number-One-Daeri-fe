@@ -20,6 +20,16 @@ export default async function NoticeDetailPage({ params }: { params: Promise<{ i
       {/* Hero */}
       <section className="bg-gradient-to-br from-gray-950 to-blue-950 text-white py-20 px-6">
         <div className="max-w-3xl mx-auto">
+          {notice.coverImageUrl ? (
+            <div className="mb-8 rounded-xl overflow-hidden border border-white/10 shadow-lg max-h-64">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={notice.coverImageUrl}
+                alt=""
+                className="w-full h-full max-h-64 object-cover"
+              />
+            </div>
+          ) : null}
           <Link
             href="/community"
             className="inline-flex items-center gap-1 text-blue-300 hover:text-white text-sm mb-6 transition"
@@ -48,14 +58,22 @@ export default async function NoticeDetailPage({ params }: { params: Promise<{ i
               </h2>
               <ul className="space-y-6">
                 {(notice.events ?? []).map((evt, i) => (
-                  <li key={i} className="flex gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
+                  <li key={i} className="flex flex-col sm:flex-row gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold sm:mt-1">
                       {i + 1}
                     </span>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">{evt.title}</h3>
-                      <p className="text-xs text-gray-500 mb-2">{evt.date}</p>
-                      <p className="text-sm text-gray-600">{evt.desc}</p>
+                    <div className="flex-1 min-w-0 flex flex-col sm:flex-row gap-4">
+                      {evt.imageUrl ? (
+                        <div className="shrink-0 w-full sm:w-40 rounded-lg overflow-hidden border border-gray-200 bg-white">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={evt.imageUrl} alt="" className="w-full h-28 sm:h-full sm:min-h-[7rem] object-cover" />
+                        </div>
+                      ) : null}
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-gray-900 mb-1">{evt.title}</h3>
+                        <p className="text-xs text-gray-500 mb-2">{evt.date}</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{evt.desc}</p>
+                      </div>
                     </div>
                   </li>
                 ))}

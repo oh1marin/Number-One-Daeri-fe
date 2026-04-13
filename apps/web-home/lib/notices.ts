@@ -4,6 +4,7 @@ export interface NoticeEvent {
   title: string;
   date: string;
   desc: string;
+  imageUrl?: string;
 }
 
 export interface Notice {
@@ -14,6 +15,7 @@ export interface Notice {
   date: string;
   views: number;
   content: string;
+  coverImageUrl?: string;
   events: NoticeEvent[];
 }
 
@@ -143,10 +145,16 @@ export async function fetchNotices(): Promise<Notice[]> {
             date: String(r.date ?? ""),
             views: Number(r.views ?? 0),
             content: String(r.content ?? ""),
+            coverImageUrl:
+              typeof r.coverImageUrl === "string" && r.coverImageUrl.trim()
+                ? r.coverImageUrl.trim()
+                : undefined,
             events: (Array.isArray(r.events) ? r.events : []).map((e: Record<string, unknown>) => ({
               title: String(e.title ?? ""),
               date: String(e.date ?? ""),
               desc: String(e.desc ?? ""),
+              imageUrl:
+                typeof e.imageUrl === "string" && e.imageUrl.trim() ? e.imageUrl.trim() : undefined,
             })),
           }));
         }

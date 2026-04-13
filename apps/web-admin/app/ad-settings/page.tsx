@@ -13,6 +13,7 @@ import {
   type AdminAdItem,
   toBulkWireItem,
 } from "@/lib/adsAdminApi";
+import { AdminImageUpload } from "@/components/AdminImageUpload";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -295,14 +296,24 @@ export default function AdSettingsPage() {
             <div className="p-6 space-y-4">
               <h3 className="font-semibold text-lg">{editing ? "광고 수정" : "광고 등록"}</h3>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">이미지 URL</label>
-                <input
+              <div className="space-y-2">
+                <AdminImageUpload
+                  label="광고 이미지"
                   value={form.imageUrl}
-                  onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border rounded text-sm"
+                  onChange={(imageUrl) => setForm((f) => ({ ...f, imageUrl }))}
+                  getAccessToken={getAccessToken}
+                  disabled={saving}
+                  storagePrefix="ads"
                 />
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">이미지 URL (직접 입력)</label>
+                  <input
+                    value={form.imageUrl}
+                    onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                    placeholder="https://... (업로드 없이 외부 URL)"
+                    className="w-full px-3 py-2 border rounded text-sm"
+                  />
+                </div>
               </div>
 
               <div>
@@ -343,7 +354,10 @@ export default function AdSettingsPage() {
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={saving || (!form.imageUrl.trim() && !form.content.trim())}
+                  disabled={
+                    saving ||
+                    (!form.imageUrl.trim() && !form.content.trim() && !form.shareText.trim())
+                  }
                   className="px-4 py-2 bg-blue-600 text-white rounded text-sm disabled:opacity-50"
                 >
                   {saving ? "저장 중…" : "저장"}
