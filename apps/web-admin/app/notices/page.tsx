@@ -5,6 +5,7 @@ import { hasAdminWebSession } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
+import { AdminImageUpload } from "@/components/AdminImageUpload";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -12,6 +13,8 @@ export interface NoticeEvent {
   title: string;
   date: string;
   desc: string;
+  /** S3 등 공개 URL — 백엔드가 공지 저장 시 함께 저장해야 함 */
+  imageUrl?: string;
 }
 
 export interface Notice {
@@ -22,6 +25,8 @@ export interface Notice {
   date: string;
   views?: number;
   content: string;
+  /** 상단 히어로·목록 썸네일 등 (선택) */
+  coverImageUrl?: string;
   events?: NoticeEvent[];
 }
 
@@ -38,6 +43,7 @@ export default function NoticesPage() {
     title: "",
     date: new Date().toISOString().slice(0, 10).replace(/-/g, "."),
     content: "",
+    coverImageUrl: "",
     events: [] as NoticeEvent[],
   });
   const [saving, setSaving] = useState(false);
@@ -59,7 +65,7 @@ export default function NoticesPage() {
   const addEvent = () => {
     setForm((f) => ({
       ...f,
-      events: [...f.events, { title: "", date: "", desc: "" }],
+      events: [...f.events, { title: "", date: "", desc: "", imageUrl: "" }],
     }));
   };
 
@@ -123,6 +129,7 @@ export default function NoticesPage() {
       title: "",
       date: new Date().toISOString().slice(0, 10).replace(/-/g, "."),
       content: "",
+      coverImageUrl: "",
       events: [],
     });
     setEditOpen(true);
@@ -136,6 +143,7 @@ export default function NoticesPage() {
       title: n.title,
       date: (n.date ?? "").replace(/-/g, ".") || new Date().toISOString().slice(0, 10).replace(/-/g, "."),
       content: n.content ?? "",
+      coverImageUrl: n.coverImageUrl ?? "",
       events: n.events ?? [],
     });
     setEditOpen(true);
@@ -154,7 +162,13 @@ export default function NoticesPage() {
         title: form.title.trim(),
         date: form.date.replace(/\./g, "-"),
         content: form.content || "",
-        events: form.events,
+        coverImageUrl: form.coverImageUrl.trim() || undefined,
+        events: form.events.map((e) => ({
+          title: e.title,
+          date: e.date,
+          desc: e.desc,
+          ...(e.imageUrl?.trim() ? { imageUrl: e.imageUrl.trim() } : {}),
+        })),
       };
       let res: Response;
       if (editing?.id) {
@@ -333,6 +347,14 @@ export default function NoticesPage() {
                   className="w-36 px-2 py-1.5 border rounded text-sm"
                 />
               </div>
+              <AdminImageUpload
+                label="대표 이미지 (선택, 웹 상단 등)"
+                value={form.coverImageUrl}
+                onChange={(coverImageUrl) => setForm((f) => ({ ...f, coverImageUrl }))}
+                getAccessToken={getAccessToken}
+                disabled={saving}
+                storagePrefix="notices"
+              />
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">본문</label>
                 <textarea
@@ -402,6 +424,14 @@ export default function NoticesPage() {
                             placeholder="이벤트 설명"
                           />
                         </div>
+                        <AdminImageUpload
+                          label="이벤트 카드 이미지 (선택)"
+                          value={evt.imageUrl ?? ""}
+                          onChange={(imageUrl) => updateEventAt(idx, { imageUrl })}
+                          getAccessToken={getAccessToken}
+                          disabled={saving}
+                          storagePrefix="notices"
+                        />
                       </div>
                     ))}
                   </div>
