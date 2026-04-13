@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FeatureIcons } from "@/components/Icons";
 import { SiApple, SiGoogleplay } from "react-icons/si";
+import { fetchNotices } from "@/lib/notices";
 
 const FEATURES = [
   { icon: "fast", title: "빠른 배차", desc: "AI 기반 매칭 시스템으로 평균 5분 이내 기사를 배정합니다." },
@@ -18,7 +19,9 @@ const STEPS = [
   { step: "04", title: "안전 귀가", desc: "배정된 기사와 함께 안전하게 귀가하세요." },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const latestNotices = (await fetchNotices()).slice(0, 3);
+
   return (
     <>
       {/* Hero — home 배경 + 문구 유지 */}
@@ -90,6 +93,45 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 최신 공지 — /community 와 동일 소스(fetchNotices). Vercel에 RIDE_API_BASE_URL 필요 */}
+      <section className="py-16 px-6 bg-white border-y border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold">공지사항</h2>
+            <Link
+              href="/community"
+              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              전체보기 →
+            </Link>
+          </div>
+          {latestNotices.length === 0 ? (
+            <p className="text-gray-500 text-sm">등록된 공지가 없습니다.</p>
+          ) : (
+            <ul className="divide-y divide-gray-100 rounded-2xl border border-gray-100 overflow-hidden bg-gray-50/50">
+              {latestNotices.map((n) => (
+                <li key={String(n.id)}>
+                  <Link
+                    href={`/community/${n.id}`}
+                    className="flex flex-wrap items-center gap-3 px-5 py-4 hover:bg-white transition"
+                  >
+                    <span
+                      className={`px-2 py-0.5 text-xs font-semibold rounded-full shrink-0 ${n.badgeColor}`}
+                    >
+                      {n.badge}
+                    </span>
+                    <span className="flex-1 min-w-0 font-medium text-sm text-gray-900 truncate">
+                      {n.title}
+                    </span>
+                    <span className="text-xs text-gray-400 shrink-0">{n.date}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
 

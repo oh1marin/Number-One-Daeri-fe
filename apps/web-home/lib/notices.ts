@@ -183,9 +183,19 @@ function mapNoticeRow(r: Record<string, unknown>): Notice {
  */
 const NOTICES_QS = "limit=50";
 
+let warnedMissingApiBase = false;
+
 export async function fetchNotices(): Promise<Notice[]> {
   const rawEnv = getServerApiBaseRaw();
-  if (!rawEnv) return NOTICES;
+  if (!rawEnv) {
+    if (process.env.NODE_ENV === "production" && !warnedMissingApiBase) {
+      warnedMissingApiBase = true;
+      console.warn(
+        "[web-home] 백엔드 URL 미설정: Vercel 환경변수에 RIDE_API_BASE_URL=https://<API호스트>/api/v1 (또는 NEXT_PUBLIC_API_BASE_URL) 를 넣고 재배포하세요. 지금은 샘플 공지만 보일 수 있습니다."
+      );
+    }
+    return NOTICES;
+  }
   // 상대 경로(`/api/v1`)만 있으면 web-home에는 리라이트가 없어 백엔드로 안 나감 → 샘플 폴백
   if (!isAbsoluteHttpUrl(rawEnv)) return NOTICES;
 
