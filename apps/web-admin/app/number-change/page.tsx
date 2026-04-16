@@ -9,51 +9,66 @@ import * as XLSX from "xlsx";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-/** 엑셀 파일에서 변경전/변경후 번호 행을 배열로 파싱. 첫 행은 헤더로 간주. */
-function parseExcelToNumberRows(file: File): Promise<{ phoneBefore: string; phoneAfter: string }[]> {
+/** FileReader → SheetJS (binary 문자열 대신 ArrayBuffer 권장, .xlsx 호환) */
+function readWorkbookFromFile(file: File): Promise<XLSX.WorkBook> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = () => {
       try {
-        const data = e.target?.result;
-        if (!data) {
-          resolve([]);
+        const buf = reader.result;
+        if (!buf || !(buf instanceof ArrayBuffer)) {
+          resolve(XLSX.utils.book_new());
           return;
         }
-        const wb = XLSX.read(data, { type: "binary" });
-        const firstSheet = wb.Sheets[wb.SheetNames[0]];
-        if (!firstSheet) {
-          resolve([]);
-          return;
-        }
-        const rows = XLSX.utils.sheet_to_json<string[]>(firstSheet, { header: 1, defval: "" }) as string[][];
-        if (rows.length < 2) {
-          resolve([]);
-          return;
-        }
-        const headers = rows[0].map((h) => String(h ?? "").trim().toLowerCase());
-        const colBefore = headers.findIndex((h) =>
-          /변경전|before|phonebefore/.test(h)
-        );
-        const colAfter = headers.findIndex((h) =>
-          /변경후|after|phoneafter/.test(h)
-        );
-        const idxBefore = colBefore >= 0 ? colBefore : 0;
-        const idxAfter = colAfter >= 0 ? colAfter : Math.max(1, colBefore >= 0 ? colBefore + 1 : 1);
-        const out: { phoneBefore: string; phoneAfter: string }[] = [];
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i] || [];
-          const before = String(row[idxBefore] ?? "").trim();
-          const after = String(row[idxAfter] ?? "").trim();
-          if (before || after) out.push({ phoneBefore: before, phoneAfter: after });
-        }
-        resolve(out);
+        const wb = XLSX.read(new Uint8Array(buf), { type: "array" });
+        resolve(wb);
       } catch (err) {
         reject(err);
       }
     };
     reader.onerror = () => reject(reader.error);
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+/** 엑셀 파일에서 변경전/변경후 번호 행을 배열로 파싱. 첫 행은 헤더로 간주. */
+function parseExcelToNumberRows(file: File): Promise<{ phoneBefore: string; phoneAfter: string }[]> {
+  return new Promise((resolve, reject) => {
+    readWorkbookFromFile(file)
+      .then((wb) => {
+        try {
+          const firstSheet = wb.Sheets[wb.SheetNames[0]];
+          if (!firstSheet) {
+            resolve([]);
+            return;
+          }
+          const rows = XLSX.utils.sheet_to_json<string[]>(firstSheet, { header: 1, defval: "" }) as string[][];
+          if (rows.length < 2) {
+            resolve([]);
+            return;
+          }
+          const headers = rows[0].map((h) => String(h ?? "").trim().toLowerCase());
+          const colBefore = headers.findIndex((h) =>
+            /변경전|기존|before|phonebefore|old/.test(h)
+          );
+          const colAfter = headers.findIndex((h) =>
+            /변경후|바뀐|신규|after|phoneafter|new/.test(h)
+          );
+          const idxBefore = colBefore >= 0 ? colBefore : 0;
+          const idxAfter = colAfter >= 0 ? colAfter : Math.max(1, colBefore >= 0 ? colBefore + 1 : 1);
+          const out: { phoneBefore: string; phoneAfter: string }[] = [];
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i] || [];
+            const before = String(row[idxBefore] ?? "").trim();
+            const after = String(row[idxAfter] ?? "").trim();
+            if (before || after) out.push({ phoneBefore: before, phoneAfter: after });
+          }
+          resolve(out);
+        } catch (err) {
+          reject(err);
+        }
+      })
+      .catch(reject);
   });
 }
 
@@ -66,43 +81,36 @@ function normalizePhone(v: string): string {
 /** 엑셀에서 전화번호 열만 파싱 (바뀐번호 조회용). 헤더에 전화번호/번호/phone 등이 있으면 해당 열, 없으면 첫 열 */
 function parseExcelToPhones(file: File): Promise<string[]> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = e.target?.result;
-        if (!data) {
-          resolve([]);
-          return;
+    readWorkbookFromFile(file)
+      .then((wb) => {
+        try {
+          const firstSheet = wb.Sheets[wb.SheetNames[0]];
+          if (!firstSheet) {
+            resolve([]);
+            return;
+          }
+          const rows = XLSX.utils.sheet_to_json<string[]>(firstSheet, { header: 1, defval: "" }) as string[][];
+          if (rows.length < 2) {
+            resolve([]);
+            return;
+          }
+          const headers = (rows[0] || []).map((h) => String(h ?? "").trim().toLowerCase());
+          const colIdx = headers.findIndex((h) =>
+            /phone|tel|번호|전화|연락/i.test(h),
+          );
+          const idx = colIdx >= 0 ? colIdx : 0;
+          const phones: string[] = [];
+          for (let i = 1; i < rows.length; i++) {
+            const cell = String((rows[i] || [])[idx] ?? "").trim();
+            const normalized = normalizePhone(cell);
+            if (normalized) phones.push(normalized);
+          }
+          resolve([...new Set(phones)]);
+        } catch (err) {
+          reject(err);
         }
-        const wb = XLSX.read(data, { type: "binary" });
-        const firstSheet = wb.Sheets[wb.SheetNames[0]];
-        if (!firstSheet) {
-          resolve([]);
-          return;
-        }
-        const rows = XLSX.utils.sheet_to_json<string[]>(firstSheet, { header: 1, defval: "" }) as string[][];
-        if (rows.length < 2) {
-          resolve([]);
-          return;
-        }
-        const headers = (rows[0] || []).map((h) => String(h ?? "").trim().toLowerCase());
-        const colIdx = headers.findIndex((h) =>
-          /phone|tel|번호|전화|연락/i.test(h),
-        );
-        const idx = colIdx >= 0 ? colIdx : 0;
-        const phones: string[] = [];
-        for (let i = 1; i < rows.length; i++) {
-          const cell = String((rows[i] || [])[idx] ?? "").trim();
-          const normalized = normalizePhone(cell);
-          if (normalized) phones.push(normalized);
-        }
-        resolve([...new Set(phones)]);
-      } catch (err) {
-        reject(err);
-      }
-    };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsBinaryString(file);
+      })
+      .catch(reject);
   });
 }
 
