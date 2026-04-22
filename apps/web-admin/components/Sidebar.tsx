@@ -21,6 +21,7 @@ const GROUPS: { label: string; icon: LucideIcon; items: { href: string; label: s
       { href: "/", label: "대시보드" },
       { href: "/daily", label: "운행일보" },
       { href: "/rides/new", label: "콜 입력" },
+      { href: "/rides/bulk-import", label: "엑셀자료등록" },
       { href: "/rides", label: "콜 조회" },
       { href: "/order-status", label: "오더현황" },
       { href: "/order-stats", label: "오더통계현황" },
