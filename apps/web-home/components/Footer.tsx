@@ -25,8 +25,12 @@ export default function Footer() {
             등록번호: 485-81-01266 | 전화: <a href="tel:031-8001-8001" className="hover:text-white transition">031-8001-8001</a> | 팩스: 031-247-1988 | 메일: <a href="mailto:orr06022@naver.com" className="hover:text-white transition">orr06022@naver.com</a>
           </div>
           <div className="flex gap-3 md:ml-auto">
-            <a href="#" className="hover:text-white transition">이용약관</a>
-            <a href="#" className="hover:text-white transition">개인정보처리방침</a>
+            <Link href="/terms" className="hover:text-white transition">
+              이용약관
+            </Link>
+            <Link href="/privacy" className="hover:text-white transition">
+              개인정보처리방침
+            </Link>
             <span className="text-gray-600">© 2026 일등대리</span>
           </div>
         </div>

@@ -219,15 +219,15 @@ export default function MileageManagePage() {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 xl:grid-cols-[1fr_min(100%,380px)] gap-4 items-start">
-        <div className="sheet-wrap min-w-0">
-          <div className="px-3 py-2 border-b border-[var(--sheet-header-border)] bg-[var(--sheet-header-bg)] flex flex-wrap items-center justify-between gap-2">
+      <div className="mt-4 grid grid-cols-1 xl:grid-cols-[1fr_min(100%,380px)] gap-4 items-stretch">
+        <div className="sheet-wrap min-w-0 flex flex-col min-h-[min(72vh,820px)] xl:min-h-[calc(100vh-11rem)]">
+          <div className="px-3 py-2 border-b border-[var(--sheet-header-border)] bg-[var(--sheet-header-bg)] flex flex-wrap items-center justify-between gap-2 shrink-0">
             <span className="text-xs font-semibold text-[var(--sheet-text)]">앱 회원 목록</span>
             <span className="text-[11px] text-[var(--sheet-text-muted)]">
               {total.toLocaleString()}명 · {page}/{totalPages}페이지
             </span>
           </div>
-          <div className="overflow-x-auto max-h-[min(520px,55vh)] overflow-y-auto">
+          <div className="overflow-x-auto overflow-y-auto flex-1 min-h-[280px] min-w-0">
             <table className="sheet-table text-[11px]">
               <thead className="sticky">
                 <tr>
@@ -277,7 +277,7 @@ export default function MileageManagePage() {
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-between gap-2 px-3 py-2 border-t-2 border-[var(--sheet-header-border)] bg-[var(--sheet-footer-bg)]">
+          <div className="flex items-center justify-between gap-2 px-3 py-2.5 border-t-2 border-[var(--sheet-header-border)] bg-[var(--sheet-footer-bg)] shrink-0 mt-auto">
             <button
               type="button"
               className="h-9 px-3 text-sm sheet-btn"
