@@ -108,13 +108,43 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold">6. 이용자 및 법정대리인의 권리와 행사 방법</h2>
             <ul className="list-disc pl-5 space-y-1 text-gray-700">
               <li>이용자는 언제든지 개인정보 열람, 정정, 삭제, 처리정지 요구를 할 수 있습니다.</li>
+              <li>
+                회원 탈퇴(계정 삭제)를 요청하는 경우, 회사는 관련 법령에 따른 보관 의무가 있는 정보를 제외하고 지체
+                없이 삭제 또는 익명화 처리합니다.
+              </li>
               <li>요청은 아래 “문의처”로 연락하시면 지체 없이 처리하겠습니다.</li>
               <li>만 14세 미만 아동의 경우 법정대리인이 권리를 행사할 수 있습니다.</li>
             </ul>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">7. 개인정보의 파기 절차 및 방법</h2>
+            <h2 className="text-xl font-semibold">7. 계정 삭제(회원 탈퇴) 및 개인정보 삭제</h2>
+            <div className="space-y-2 text-gray-700">
+              <p>
+                이용자는 언제든지 계정 삭제(회원 탈퇴)를 요청할 수 있습니다. 계정 삭제를 요청하면 서비스 제공을 위해
+                보관 중인 개인정보는 관련 법령에 따른 보관 의무가 있는 경우를 제외하고 지체 없이 삭제 또는 익명화
+                처리합니다.
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>
+                  <span className="font-medium">요청 방법</span>: 고객센터(1668-0001) 또는 이메일(
+                  <span className="font-medium">orr06022@naver.com</span>)로 “계정 삭제 요청”을 보내주세요.
+                  본인 확인을 위해 가입한 휴대전화번호 등 최소 정보 확인이 필요할 수 있습니다.
+                </li>
+                <li>
+                  <span className="font-medium">삭제 대상</span>: 계정 정보(전화번호 등), 서비스 이용과정에서 생성된
+                  개인정보(예: 프로필 정보, 알림 토큰 등) 중 보관 의무가 없는 항목
+                </li>
+                <li>
+                  <span className="font-medium">보관 예외</span>: 전자상거래 등 관련 법령에 따라 거래/정산/분쟁 처리를
+                  위해 일정 기간 보관이 필요한 정보는 해당 기간 동안 보관 후 파기합니다.
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-semibold">8. 개인정보의 파기 절차 및 방법</h2>
             <ul className="list-disc pl-5 space-y-1 text-gray-700">
               <li>파기 사유가 발생한 개인정보는 내부 방침 및 관련 법령에 따라 안전하게 파기합니다.</li>
               <li>전자적 파일 형태의 정보는 복구 불가능한 방법으로 삭제합니다.</li>
@@ -122,7 +152,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">8. 개인정보 보호를 위한 기술적·관리적 조치</h2>
+            <h2 className="text-xl font-semibold">9. 개인정보 보호를 위한 기술적·관리적 조치</h2>
             <ul className="list-disc pl-5 space-y-1 text-gray-700">
               <li>접근권한 관리, 접근통제, 암호화, 보안 업데이트 등</li>
               <li>개인정보 취급자 최소화 및 내부 교육</li>
@@ -131,7 +161,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">9. 문의처</h2>
+            <h2 className="text-xl font-semibold">10. 문의처</h2>
             <p className="text-gray-700">
               개인정보 보호 관련 문의, 불만 처리, 피해 구제는 아래로 연락해 주세요.
             </p>
@@ -143,7 +173,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">10. 고지의 의무</h2>
+            <h2 className="text-xl font-semibold">11. 고지의 의무</h2>
             <p className="text-gray-700">
               본 개인정보처리방침의 내용 추가, 삭제 및 수정이 있을 경우 시행일자 최소 7일 전부터 서비스 내 공지 또는
               본 페이지를 통해 고지합니다.
