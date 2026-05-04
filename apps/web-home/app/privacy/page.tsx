@@ -18,7 +18,8 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <p>
               일등대리(이하 “회사”)는 「개인정보 보호법」 등 관련 법령을 준수하며, 이용자의 개인정보를 안전하게
-              보호하기 위해 다음과 같이 개인정보처리방침을 수립·공개합니다.
+              보호하기 위해 다음과 같이 개인정보처리방침을 수립·공개합니다. 서비스 애플리케이션 등은 개발사
+              마린소프트가 개발합니다.
             </p>
           </section>
 
@@ -167,6 +168,7 @@ export default function PrivacyPage() {
             </p>
             <div className="rounded-2xl border border-gray-200 p-4 text-sm text-gray-700 space-y-1">
               <div>상호: 일등대리</div>
+              <div>개발사: 마린소프트 | 대표: 오마린 | 사업자등록번호: 225-51-12994</div>
               <div>전화: 031-8001-8001 / 고객센터 1668-0001</div>
               <div>이메일: orr06022@naver.com</div>
             </div>
