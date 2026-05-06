@@ -97,7 +97,7 @@ function parseListItem(row: Record<string, unknown>): InquiryListItem {
   const lastUserContent =
     needsReply && typeof lastMsg?.content === "string" ? String(lastMsg.content) : "";
   const handoffRequested =
-    needsReply && /\[상담사\s*호출\s*요청\]|상담사\s*호출/.test(lastUserContent);
+    needsReply && /\[상담(사|원)\s*호출\s*요청\]|상담(사|원)\s*호출/.test(lastUserContent);
 
   return {
     id: String(row.id ?? ""),

@@ -5,6 +5,7 @@ import { fetchInquiriesList } from "./inquiriesAdminApi";
 import { hasAdminWebSession } from "./auth";
 
 const STORAGE_KEY = "admin_seen_inquiry_ids";
+const HANDOFF_STORAGE_KEY = "admin_seen_handoff_inquiry_ids";
 const POLL_INTERVAL_MS = 15_000;
 
 function getSeenIds(): Set<string> {
@@ -24,6 +25,27 @@ function addSeenIds(ids: string[]) {
     // 최대 500개만 유지
     const arr = Array.from(existing).slice(-500);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  } catch {
+    /* ignore */
+  }
+}
+
+function getSeenHandoffIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(HANDOFF_STORAGE_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+function addSeenHandoffIds(ids: string[]) {
+  try {
+    const existing = getSeenHandoffIds();
+    for (const id of ids) existing.add(id);
+    const arr = Array.from(existing).slice(-500);
+    localStorage.setItem(HANDOFF_STORAGE_KEY, JSON.stringify(arr));
   } catch {
     /* ignore */
   }
@@ -59,8 +81,36 @@ function showBrowserNotification(count: number, firstName: string) {
   }
 }
 
+function showHandoffNotification(firstName: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  try {
+    const title = "상담원 호출 요청";
+    const body = firstName ? `"${firstName}" 고객이 상담원을 호출했습니다.` : "고객이 상담원을 호출했습니다.";
+    const n = new Notification(title, {
+      body,
+      icon: "/favicon.ico",
+      tag: "inquiry-handoff-notification",
+    });
+    setTimeout(() => n.close(), 8000);
+    n.onclick = () => {
+      window.focus();
+      window.location.href = "/inquiries";
+      n.close();
+    };
+  } catch {
+    /* ignore */
+  }
+}
+
 export function useInquiryNotifier(getAccessToken: () => string | null) {
   const [unreadCount, setUnreadCount] = useState(0);
+  const [handoffToast, setHandoffToast] = useState<{
+    inquiryId: string;
+    firstName: string;
+    count: number;
+    at: number;
+  } | null>(null);
   const permissionRequestedRef = useRef(false);
   const initializedRef = useRef(false);
 
@@ -85,6 +135,8 @@ export function useInquiryNotifier(getAccessToken: () => string | null) {
     if (!initializedRef.current) {
       // 첫 폴링: 기존 항목을 모두 "이미 봤음"으로 처리 (알림 안 띄움)
       addSeenIds(allIds);
+      // 첫 폴링: 기존 '상담원 호출'도 이미 봤음으로 처리
+      addSeenHandoffIds(res.data.items.filter((i) => i.handoffRequested).map((i) => i.id));
       initializedRef.current = true;
       const unread = res.data.items.filter((i) => i.needsReply).length;
       setUnreadCount(unread);
@@ -96,6 +148,20 @@ export function useInquiryNotifier(getAccessToken: () => string | null) {
       addSeenIds(newItems.map((i) => i.id));
       const firstName = newItems[0]?.user?.name ?? newItems[0]?.user?.phone ?? "";
       showBrowserNotification(newItems.length, firstName);
+    }
+
+    const seenHandoffIds = getSeenHandoffIds();
+    const newHandoff = res.data.items.filter((i) => i.handoffRequested && !seenHandoffIds.has(i.id));
+    if (newHandoff.length > 0) {
+      addSeenHandoffIds(newHandoff.map((i) => i.id));
+      const firstName = newHandoff[0]?.user?.name ?? newHandoff[0]?.user?.phone ?? "";
+      showHandoffNotification(firstName);
+      setHandoffToast({
+        inquiryId: newHandoff[0]?.id ?? "",
+        firstName,
+        count: newHandoff.length,
+        at: Date.now(),
+      });
     }
 
     const unread = res.data.items.filter((i) => i.needsReply).length;
@@ -113,5 +179,5 @@ export function useInquiryNotifier(getAccessToken: () => string | null) {
     return () => window.clearInterval(interval);
   }, [poll]);
 
-  return { unreadCount };
+  return { unreadCount, handoffToast };
 }

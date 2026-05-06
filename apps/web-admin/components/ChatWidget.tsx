@@ -17,7 +17,6 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
-import { useInquiryNotifier } from "@/lib/useInquiryNotifier";
 import {
   fetchInquiriesList,
   fetchInquiryDetail,
@@ -325,9 +324,8 @@ function InquiryRow({
 
 /* ─────────────────────── main widget ─────────────────────── */
 
-export default function ChatWidget() {
+export default function ChatWidget({ unreadCount }: { unreadCount: number }) {
   const { getAccessToken } = useAuth();
-  const { unreadCount } = useInquiryNotifier(getAccessToken);
 
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
