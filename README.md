@@ -1,5 +1,9 @@
 <div align="center">
 
+[**Number-One-Daeri-fe**](https://github.com/oh1marin/Number-One-Daeri-fe) · [**Number-One-Daeri-be**](https://github.com/oh1marin/Number-One-Daeri-be) · [**Number-One-Daeri-user-app**](https://github.com/oh1marin/Number-One-Daeri-user-app)
+
+<br />
+
 # Number-One-Daeri **FE**
 
 ### 일등대리 · 프론트엔드 모노레포
@@ -17,11 +21,30 @@
 
 <br />
 
-[Web apps](#web-apps) · [Layout](#layout) · [Stack](#stack) · [Scripts](#scripts)
+[Repos](#repos) · [Web apps](#web-apps) · [Layout](#layout) · [Stack](#stack) · [Scripts](#scripts)
 
 </div>
 
 <br />
+
+---
+
+## Repos
+
+같은 계정([**oh1marin**](https://github.com/oh1marin))에서 함께 운영하는 레포입니다. 로컬에서는 보통 **형제 폴더**로 클론해 둡니다.
+
+| | GitHub | 로컬 경로 예시 |
+|---|--------|----------------|
+| **FE** (이 저장소) | [oh1marin/Number-One-Daeri-fe](https://github.com/oh1marin/Number-One-Daeri-fe) | `Number-One-Daeri-fe/` |
+| **BE** (백엔드 API) | [oh1marin/Number-One-Daeri-be](https://github.com/oh1marin/Number-One-Daeri-be) | `Number-One-Daeri-be/` |
+| **사용자 앱** (Flutter) | [oh1marin/Number-One-Daeri-user-app](https://github.com/oh1marin/Number-One-Daeri-user-app) | `Number-One-Daeri-user-app/` |
+
+```text
+원하는 부모 디렉터리/
+├── Number-One-Daeri-fe/          ← 이 레포 (Next.js web-home · web-admin)
+├── Number-One-Daeri-be/          ← API 서버
+└── Number-One-Daeri-user-app/    ← 사용자 앱 (Flutter)
+```
 
 ---
 
