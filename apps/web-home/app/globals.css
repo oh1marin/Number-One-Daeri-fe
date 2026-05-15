@@ -9,3 +9,10 @@
   --color-brand-muted: #93c5fd;
   --color-brand-ring: rgb(37 99 235 / 0.35);
 }
+
+/* 기본 16px 대비 약 3% 키움 — rem 단위 전반에 반영 */
+@layer base {
+  html {
+    font-size: 103%;
+  }
+}
