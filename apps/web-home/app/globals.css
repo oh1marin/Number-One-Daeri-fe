@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+/* 브랜드·포커스 — 페이지 전반 통일 */
+@theme inline {
+  --color-brand: #2563eb;
+  --color-brand-hover: #1d4ed8;
+  --color-brand-soft: #eff6ff;
+  --color-brand-on-dark: #60a5fa;
+  --color-brand-muted: #93c5fd;
+  --color-brand-ring: rgb(37 99 235 / 0.35);
+}

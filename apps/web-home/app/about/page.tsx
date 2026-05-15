@@ -6,10 +6,10 @@ export const metadata: Metadata = {
 };
 
 const VALUES = [
-  { icon: "safe", title: "안전", desc: "모든 기사는 3단계 심사와 정기 교육을 통해 검증됩니다." },
-  { icon: "fast", title: "신속", desc: "AI 매칭으로 어디서든 5분 이내 배차를 보장합니다." },
+  { icon: "safe", title: "안전", desc: "전문 기사가 안전하게 운전해 고객을 모십니다." },
+  { icon: "fast", title: "신속", desc: "요청하시면 가까운 기사로 빠르게 매칭됩니다." },
   { icon: "trust", title: "신뢰", desc: "투명한 요금과 정직한 서비스로 고객 신뢰를 최우선합니다." },
-  { icon: "together", title: "상생", desc: "기사와 고객 모두가 만족하는 건강한 플랫폼을 만듭니다." },
+  { icon: "comfort", title: "편의", desc: "앱으로 간편하게 호출하고, 결제까지 한곳에서 이용하실 수 있습니다." },
 ];
 
 export default function AboutPage() {
@@ -38,8 +38,7 @@ export default function AboutPage() {
               안전한 귀가 문화를 만들어 나갑니다.
             </p>
             <p className="text-gray-600 leading-relaxed">
-              기술과 신뢰를 기반으로 기사와 고객 모두가 만족하는
-              지속 가능한 플랫폼을 구축합니다.
+              고객이 믿고 이용할 수 있는 대리운전 서비스를 꾸준히 이어가겠습니다.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">

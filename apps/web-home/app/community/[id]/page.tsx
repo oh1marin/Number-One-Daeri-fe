@@ -32,7 +32,7 @@ export default async function NoticeDetailPage({ params }: { params: Promise<{ i
           ) : null}
           <Link
             href="/community"
-            className="inline-flex items-center gap-1 text-blue-300 hover:text-white text-sm mb-6 transition"
+            className="inline-flex items-center gap-1 text-brand-muted hover:text-white text-sm mb-6 transition"
           >
             ← 공지사항 목록
           </Link>
@@ -59,7 +59,7 @@ export default async function NoticeDetailPage({ params }: { params: Promise<{ i
               <ul className="space-y-6">
                 {(notice.events ?? []).map((evt, i) => (
                   <li key={i} className="flex flex-col sm:flex-row gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold sm:mt-1">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-soft text-brand flex items-center justify-center text-sm font-bold sm:mt-1">
                       {i + 1}
                     </span>
                     <div className="flex-1 min-w-0 flex flex-col sm:flex-row gap-4">

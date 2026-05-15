@@ -71,14 +71,14 @@ export default function ContactPage() {
               <div className="flex-shrink-0">{ContactIcons.phone}</div>
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">대표전화</p>
-                <a href="tel:1668-0001" className="font-bold text-gray-900 hover:text-blue-600">1668-0001</a>
+                <a href="tel:1668-0001" className="font-bold text-gray-900 hover:text-brand">1668-0001</a>
               </div>
             </div>
             <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100">
               <div className="flex-shrink-0">{ContactIcons.email}</div>
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">이메일 문의</p>
-                <a href="mailto:sj2mail2@gmail.com" className="font-bold text-blue-600 hover:underline">
+                <a href="mailto:sj2mail2@gmail.com" className="font-bold text-brand hover:underline">
                   sj2mail2@gmail.com
                 </a>
               </div>
@@ -95,7 +95,7 @@ export default function ContactPage() {
               </p>
               <button
                 onClick={() => setStatus("idle")}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="px-6 py-2.5 bg-brand text-white rounded-lg font-semibold hover:bg-brand-hover transition"
               >
                 새 문의 작성
               </button>
@@ -116,7 +116,7 @@ export default function ContactPage() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="홍길동 (미입력 시 비공개)"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition"
                 />
               </div>
 
@@ -132,7 +132,7 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="example@email.com"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition"
                 />
               </div>
 
@@ -148,7 +148,7 @@ export default function ContactPage() {
                   value={form.phone}
                   onChange={handleChange}
                   placeholder="010-1234-5678"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition"
                 />
               </div>
 
@@ -165,7 +165,7 @@ export default function ContactPage() {
                   value={form.content}
                   onChange={handleChange}
                   placeholder="문의하실 내용을 자세히 적어주세요."
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition resize-none"
                 />
                 <p className="text-xs text-gray-400 mt-1.5 text-right">{form.content.length} / 1000</p>
               </div>
@@ -177,7 +177,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-brand text-white font-semibold rounded-xl hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === "loading" ? "제출 중..." : "문의 제출"}
               </button>

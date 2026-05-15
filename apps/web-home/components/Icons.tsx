@@ -7,7 +7,7 @@ import { PiMapTrifoldLight, PiShieldCheck, PiSparkle, PiHandshake } from "react-
 import { TbMapPin, TbPhone, TbMail } from "react-icons/tb";
 import { MdCheckCircle } from "react-icons/md";
 
-const iconClass = "w-8 h-8 text-blue-600";
+const iconClass = "w-8 h-8 text-brand";
 
 export const FeatureIcons = {
   fast: <LuZap className={iconClass} />,
@@ -23,17 +23,19 @@ export const ValueIcons = {
   fast: <LuZap className={iconClass} />,
   trust: <PiSparkle className={iconClass} />,
   together: <PiHandshake className={iconClass} />,
+  /** 회사소개 — 상생 대체 등 */
+  comfort: <LuMessageCircle className={iconClass} />,
 };
 
 export const ContactIcons = {
-  phone: <TbPhone className="w-7 h-7 text-blue-600" />,
-  email: <TbMail className="w-7 h-7 text-blue-600" />,
+  phone: <TbPhone className="w-7 h-7 text-brand" />,
+  email: <TbMail className="w-7 h-7 text-brand" />,
 };
 
 export const LocationIcons = {
-  pin: <TbMapPin className="w-6 h-6 text-blue-600" />,
-  phone: <TbPhone className="w-6 h-6 text-blue-600" />,
-  email: <TbMail className="w-6 h-6 text-blue-600" />,
+  pin: <TbMapPin className="w-6 h-6 text-brand" />,
+  phone: <TbPhone className="w-6 h-6 text-brand" />,
+  email: <TbMail className="w-6 h-6 text-brand" />,
 };
 
 export const MapFallbackIcon = (

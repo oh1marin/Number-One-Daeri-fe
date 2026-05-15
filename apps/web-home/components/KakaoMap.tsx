@@ -137,7 +137,7 @@ function KakaoMapWithKey() {
             href={links.map}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2.5 text-center text-sm text-blue-600 hover:underline"
+            className="flex-1 py-2.5 text-center text-sm text-brand hover:underline"
           >
             카카오맵에서 크게 보기
           </a>
@@ -145,7 +145,7 @@ function KakaoMapWithKey() {
             href={links.directions}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2.5 text-center text-sm text-blue-600 hover:underline"
+            className="flex-1 py-2.5 text-center text-sm text-brand hover:underline"
           >
             길찾기
           </a>
@@ -203,7 +203,7 @@ function FallbackLink() {
           href={links.directions}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 py-2.5 text-center text-sm font-semibold text-blue-600 hover:bg-blue-50"
+          className="flex-1 py-2.5 text-center text-sm font-semibold text-brand hover:bg-brand-soft"
         >
           길찾기
         </a>

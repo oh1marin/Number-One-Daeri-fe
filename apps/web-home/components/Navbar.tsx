@@ -17,7 +17,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
@@ -31,9 +31,9 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2 ${
                 pathname === link.href
-                  ? "bg-blue-50 text-blue-600"
+                  ? "bg-brand-soft text-brand"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
@@ -45,8 +45,11 @@ export default function Navbar() {
 
         {/* Mobile Hamburger */}
         <button
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+          type="button"
+          className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2"
           onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={menuOpen}
         >
           <div className="w-5 h-0.5 bg-gray-700 mb-1" />
           <div className="w-5 h-0.5 bg-gray-700 mb-1" />
@@ -62,9 +65,9 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2 ${
                 pathname === link.href
-                  ? "bg-blue-50 text-blue-600"
+                  ? "bg-brand-soft text-brand"
                   : "text-gray-600 hover:bg-gray-50"
               }`}
             >
@@ -73,7 +76,7 @@ export default function Navbar() {
           ))}
           <a
             href="#download"
-            className="mt-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg text-center"
+            className="mt-2 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg text-center hover:bg-brand-hover transition focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2"
           >
             앱 다운로드
           </a>
