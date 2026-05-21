@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { AdminUser, getStoredAuth, setStoredAuth, clearStoredAuth } from "./auth";
 import { allowMockAdminAuth } from "./adminEnv";
+import { getAdminLoginUrl } from "./adminAuthUrls";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const AUTO_LOGOUT_MS = 60 * 60 * 1000; // 1시간
@@ -139,7 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     if (API_BASE?.trim()) {
       try {
-        const res = await fetch(`${API_BASE}/admin/auth/login`, {
+        const res = await fetch(getAdminLoginUrl(), {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
