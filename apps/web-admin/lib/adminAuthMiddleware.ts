@@ -58,8 +58,9 @@ export function isLoginRateLimitPath(pathname: string, method: string): boolean 
 }
 
 export function shouldSkipAuthMiddleware(): boolean {
-  if (process.env.ADMIN_MIDDLEWARE_AUTH === "false") return true;
-  // mock 로그인은 httpOnly 쿠키가 없음 → 개발 시 middleware 인증 생략
+  // BE 쿠키 Path=/api/v1/admin → www 페이지 요청에 쿠키 없음. 명시적으로 true 일 때만 middleware 인증
+  if (process.env.ADMIN_MIDDLEWARE_AUTH !== "true") return true;
+  // mock 로그인은 httpOnly 쿠키가 없음
   if (
     process.env.NODE_ENV !== "production" &&
     process.env.NEXT_PUBLIC_ALLOW_MOCK_AUTH === "true"
