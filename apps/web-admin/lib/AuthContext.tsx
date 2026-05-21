@@ -152,13 +152,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const hint = res.status === 401 ? " (백엔드: /admin/auth/login 은 인증 없이 공개되어야 합니다)" : "";
           return { ok: false, error: msg + hint };
         }
-        const u = adminFromAuthData(json.data ?? json);
+        let u = adminFromAuthData(json.data ?? json);
+        // BE가 쿠키만 내려주고 본문에 admin 이 없는 경우 → /me 로 프로필 조회
+        if (!u) {
+          const meRes = await fetchAdminMeWithRefresh();
+          if (meRes.ok) {
+            const meJson = await meRes.json();
+            u = parseMePayload(meJson);
+          }
+        }
         if (u) {
           setStoredAuth({ admin: u });
           setUser(u);
           return { ok: true };
         }
-        return { ok: false, error: "로그인 응답 형식이 올바르지 않습니다." };
+        return {
+          ok: false,
+          error:
+            "로그인은 되었으나 관리자 정보를 받지 못했습니다. (응답에 email/name 없음 또는 /admin/auth/me 실패·쿠키 미전송)",
+        };
       } catch {
         return { ok: false, error: "네트워크 오류가 발생했습니다." };
       }
