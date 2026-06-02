@@ -50,9 +50,8 @@ export function listFromApi(json: unknown): GifticonProduct[] {
 
 export async function fetchGifticonProducts(getAccessToken: () => string | null): Promise<GifticonProduct[]> {
   const res = await adminFetch("/gifticon/products", { method: "GET", getAccessToken });
-  const { json } = await readAdminResponseBody(res);
+  const { json, rawText } = await readAdminResponseBody(res);
   if (!res.ok) {
-    const { rawText } = await readAdminResponseBody(res);
     throw new Error(getAdminApiFailureMessage(res, json, rawText));
   }
   return listFromApi(json);
