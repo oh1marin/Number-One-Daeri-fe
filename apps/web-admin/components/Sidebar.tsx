@@ -58,6 +58,7 @@ const GROUPS: { label: string; icon: LucideIcon; items: { href: string; label: s
       { href: "/accumulation", label: "적립설정" },
       { href: "/coupon-purchases", label: "쿠폰구매현황" },
       { href: "/coupon-requests", label: "기프티콘 신청관리" },
+      { href: "/gifticon-shop", label: "기프티콘 상점" },
       { href: "/promo-list", label: "홍보리스트" },
       { href: "/recommendation-kings", label: "추천왕 리스트" },
       { href: "/mileage/history", label: "마일리지 적립현황" },
