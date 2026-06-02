@@ -49,7 +49,9 @@ export function listFromApi(json: unknown): GifticonProduct[] {
 }
 
 export async function fetchGifticonProducts(getAccessToken: () => string | null): Promise<GifticonProduct[]> {
-  const res = await adminFetch("/gifticon/products", { method: "GET", getAccessToken });
+  // 앱 라우트(/gifticon/products)는 유저 인증(req.user)을 요구할 수 있어 관리자에서는 401이 날 수 있음.
+  // 관리자 관리 화면은 admin 엔드포인트를 사용.
+  const res = await adminFetch("/admin/gifticon/products", { method: "GET", getAccessToken });
   const { json, rawText } = await readAdminResponseBody(res);
   if (!res.ok) {
     throw new Error(getAdminApiFailureMessage(res, json, rawText));
