@@ -150,6 +150,15 @@ function extractNoticeList(data: unknown): unknown[] | null {
   return null;
 }
 
+function resolvePublicMediaUrl(url: string | undefined): string | undefined {
+  if (!url?.trim()) return undefined;
+  const u = url.trim();
+  if (isAbsoluteHttpUrl(u)) return u;
+  const origin = getApiOriginWithoutV1();
+  if (u.startsWith("/")) return `${origin}${u}`;
+  return `${origin}/${u}`;
+}
+
 function mapNoticeRow(r: Record<string, unknown>): Notice {
   return {
     id:
@@ -164,16 +173,16 @@ function mapNoticeRow(r: Record<string, unknown>): Notice {
     date: String(r.date ?? ""),
     views: Number(r.views ?? 0),
     content: String(r.content ?? ""),
-    coverImageUrl:
-      typeof r.coverImageUrl === "string" && r.coverImageUrl.trim()
-        ? r.coverImageUrl.trim()
-        : undefined,
+    coverImageUrl: resolvePublicMediaUrl(
+      typeof r.coverImageUrl === "string" ? r.coverImageUrl : undefined
+    ),
     events: (Array.isArray(r.events) ? r.events : []).map((e: Record<string, unknown>) => ({
       title: String(e.title ?? ""),
       date: String(e.date ?? ""),
       desc: String(e.desc ?? ""),
-      imageUrl:
-        typeof e.imageUrl === "string" && e.imageUrl.trim() ? e.imageUrl.trim() : undefined,
+      imageUrl: resolvePublicMediaUrl(
+        typeof e.imageUrl === "string" ? e.imageUrl : undefined
+      ),
     })),
   };
 }

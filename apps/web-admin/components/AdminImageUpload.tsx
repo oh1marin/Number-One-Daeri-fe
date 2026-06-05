@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { normalizeImageContentType, presignAndUploadImage } from "@/lib/uploadAsset";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -90,7 +91,7 @@ export function AdminImageUpload({
       {value ? (
         <div className="rounded-lg border border-gray-200 overflow-hidden bg-gray-50 max-w-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="" className="w-full h-32 object-cover" />
+          <img src={resolveMediaUrl(value, API_BASE) || value} alt="" className="w-full h-32 object-cover" />
           <p className="text-[10px] text-gray-500 p-1.5 break-all">{value}</p>
         </div>
       ) : (
