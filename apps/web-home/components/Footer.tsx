@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COMPANY } from "@/lib/companyInfo";
 
 const linkClass = "text-gray-400 hover:text-white transition";
 
@@ -10,6 +11,9 @@ export default function Footer() {
           <div className="space-y-2">
             <p className="text-white font-semibold text-sm tracking-tight">서비스</p>
             <div className="flex flex-col gap-1.5">
+              <Link href="/services" className={linkClass}>
+                서비스·요금
+              </Link>
               <Link href="/about" className={linkClass}>
                 회사소개
               </Link>
@@ -27,27 +31,30 @@ export default function Footer() {
 
           <div className="space-y-2">
             <p className="text-white font-semibold text-sm tracking-tight">고객센터</p>
-            <a href="tel:1668-0001" className={`${linkClass} text-sm font-medium`}>
-              1668-0001
+            <a href={`tel:${COMPANY.customerCenter}`} className={`${linkClass} text-sm font-medium`}>
+              {COMPANY.customerCenter}
             </a>
           </div>
 
           <div className="space-y-2 sm:col-span-2 lg:col-span-2">
             <p className="text-white font-semibold text-sm tracking-tight">사업자 정보</p>
             <p className="text-gray-500">
-              일등대리 · 개발사 마린소프트 · 대표 오마린 · 사업자등록번호{" "}
-              <span className="text-gray-400 tabular-nums">225-51-12994</span>
+              {COMPANY.serviceName} · {COMPANY.developerName} · 대표 {COMPANY.representative} · 사업자등록번호{" "}
+              <span className="text-gray-400 tabular-nums">{COMPANY.businessRegistrationNumber}</span>
+            </p>
+            <p className="text-gray-500">
+              <span className="text-gray-400 font-medium">{COMPANY.addressLabel}:</span> {COMPANY.fullAddress}
             </p>
             <p className="text-gray-500">
               전화:{" "}
-              <a href="tel:031-8001-8001" className={linkClass}>
-                031-8001-8001
+              <a href={`tel:${COMPANY.phone}`} className={linkClass}>
+                {COMPANY.phone}
               </a>{" "}
-              · 팩스: <span className="text-gray-500 tabular-nums">031-247-1988</span>
+              · 팩스: <span className="text-gray-500 tabular-nums">{COMPANY.fax}</span>
               <br />
               메일:{" "}
-              <a href="mailto:orr06022@naver.com" className={linkClass}>
-                orr06022@naver.com
+              <a href={`mailto:${COMPANY.email}`} className={linkClass}>
+                {COMPANY.email}
               </a>
             </p>
           </div>
@@ -64,8 +71,11 @@ export default function Footer() {
             <Link href="/refund" className={linkClass}>
               환불정책
             </Link>
+            <Link href="/services" className={linkClass}>
+              서비스·요금
+            </Link>
           </div>
-          <p className="text-gray-600">© 2026 일등대리</p>
+          <p className="text-gray-600">© 2026 {COMPANY.serviceName}</p>
         </div>
       </div>
     </footer>

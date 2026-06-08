@@ -2,6 +2,8 @@ import Link from "next/link";
 import { FeatureIcons } from "@/components/Icons";
 import { SiApple, SiGoogleplay } from "react-icons/si";
 import { fetchNotices } from "@/lib/notices";
+import BusinessInfoBlock from "@/components/BusinessInfoBlock";
+import { SERVICE_PRODUCTS } from "@/lib/companyInfo";
 
 const APP_STORE_URL = process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() || "";
 const GOOGLE_PLAY_URL = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL?.trim() || "";
@@ -165,6 +167,56 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 서비스·요금 (PG 심사용 — 가격 표시 상품) */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold">서비스 및 요금</h2>
+              <p className="text-gray-500 text-sm mt-2">대리운전 유료 서비스 — 거리(km) 기준 요금 (원)</p>
+            </div>
+            <Link
+              href="/services"
+              className="text-sm font-medium text-brand hover:underline underline-offset-4"
+            >
+              전체 요금표 →
+            </Link>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-gray-200">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-left">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">서비스명</th>
+                  <th className="px-4 py-3 font-semibold">설명</th>
+                  <th className="px-4 py-3 font-semibold whitespace-nowrap">가격</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {SERVICE_PRODUCTS.slice(0, 3).map((p) => (
+                  <tr key={p.id}>
+                    <td className="px-4 py-3 font-medium">{p.name}</td>
+                    <td className="px-4 py-3 text-gray-600">{p.description}</td>
+                    <td className="px-4 py-3 tabular-nums whitespace-nowrap">
+                      {p.price.toLocaleString("ko-KR")}원 / km
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-gray-400 mt-3">
+            예: 10km 일반 호출 약 10,000원 · 64km 기준 일반 64,000원 / 빠른 72,000원 / 프리미엄 82,000원
+          </p>
+        </div>
+      </section>
+
+      {/* 사업자 정보 (PG — 주소 명시) */}
+      <section className="py-16 px-6 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <BusinessInfoBlock />
         </div>
       </section>
 

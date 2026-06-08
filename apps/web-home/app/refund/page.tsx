@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COMPANY } from "@/lib/companyInfo";
 
 export const metadata: Metadata = {
   title: "환불정책 | 일등대리",
@@ -68,6 +69,7 @@ export default function RefundPage() {
             <div className="rounded-2xl border border-gray-200 p-4 text-sm text-gray-700 space-y-1">
               <div>서비스명: 일등대리</div>
               <div>개발사: 마린소프트 | 대표: 오마린 | 사업자등록번호: 225-51-12994</div>
+              <div>{COMPANY.addressLabel}: {COMPANY.fullAddress}</div>
               <div>전화: 031-8001-8001 / 고객센터 1668-0001</div>
               <div>이메일: orr06022@naver.com</div>
             </div>

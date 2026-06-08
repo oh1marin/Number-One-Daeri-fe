@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ValueIcons } from "@/components/Icons";
+import BusinessInfoBlock from "@/components/BusinessInfoBlock";
 
 export const metadata: Metadata = {
   title: "회사소개 | 일등대리",
@@ -50,6 +51,12 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-6 bg-gray-50 border-t border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <BusinessInfoBlock />
         </div>
       </section>
     </>

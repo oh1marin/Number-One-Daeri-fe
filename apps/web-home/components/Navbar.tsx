@@ -6,6 +6,7 @@ import { useState } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "홈" },
+  { href: "/services", label: "서비스·요금" },
   { href: "/about", label: "회사소개" },
   { href: "/location", label: "오시는길" },
   { href: "/community", label: "공지사항" },

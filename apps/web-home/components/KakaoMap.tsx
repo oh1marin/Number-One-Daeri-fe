@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useKakaoLoader, Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk";
 import { MapFallbackIcon } from "./Icons";
+import { COMPANY } from "@/lib/companyInfo";
 
-const ADDRESS = "경기도 수원시 권선구 효원로 226 덕화빌딩 302호";
-const PLACE_NAME = "일등대리";
-// 기본 좌표 (Geocoder 실패 시 fallback) — 수원 권선구 효원로 226 근처
-const DEFAULT_COORDS = { lat: 37.2642, lng: 127.0248 };
+const ADDRESS = COMPANY.fullAddress;
+const PLACE_NAME = COMPANY.serviceName;
+// Geocoder 실패 시 fallback — 평택시 용이동 신흥1로 67 근처
+const DEFAULT_COORDS = { lat: 36.9923, lng: 127.1127 };
 const APP_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY || "";
 
 function getKakaoLinks(coords: { lat: number; lng: number }) {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { ContactIcons, SuccessIcon } from "@/components/Icons";
 import { getApiV1Base } from "@/lib/apiBase";
+import BusinessInfoBlock from "@/components/BusinessInfoBlock";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", content: "" });
@@ -84,6 +85,8 @@ export default function ContactPage() {
               </div>
             </div>
           </div>
+
+          <BusinessInfoBlock variant="compact" className="mb-10 p-4 bg-gray-50 rounded-2xl border border-gray-100" />
 
           {/* 폼 */}
           {status === "success" ? (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import KakaoMap from "@/components/KakaoMap";
 import { LocationIcons } from "@/components/Icons";
+import { COMPANY } from "@/lib/companyInfo";
 
 export const metadata: Metadata = {
   title: "오시는길 | 일등대리",
@@ -25,10 +26,13 @@ export default function LocationPage() {
           <div className="flex gap-4 p-5 bg-gray-50 rounded-xl">
             <div className="flex-shrink-0">{LocationIcons.pin}</div>
             <div>
-              <h2 className="font-bold text-lg mb-1">일등대리</h2>
+              <h2 className="font-bold text-lg mb-1">사업장 주소</h2>
               <p className="text-gray-600 text-sm">
-                경기도 수원시 권선구 효원로 226<br />
-                덕화빌딩 302호
+                일등대리 · {COMPANY.developerName}
+                <br />
+                {COMPANY.addressLine1}
+                <br />
+                {COMPANY.addressLine2}
               </p>
             </div>
           </div>
