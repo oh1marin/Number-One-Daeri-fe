@@ -5,6 +5,7 @@ import { hasAdminWebSession } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
+import { formatDateTimeKST } from "@/lib/formatDateTime";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const MAX_CHARGE_AMOUNT = 1_000_000;
@@ -13,23 +14,6 @@ function formatNumber(n: unknown) {
   const v = typeof n === "number" ? n : Number(n ?? 0);
   if (Number.isNaN(v)) return "0";
   return v.toLocaleString();
-}
-
-function formatDate(s: string): string {
-  if (!s) return "-";
-  try {
-    const d = new Date(s);
-    if (isNaN(d.getTime())) return s;
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    const h = String(d.getHours()).padStart(2, "0");
-    const min = String(d.getMinutes()).padStart(2, "0");
-    const sec = String(d.getSeconds()).padStart(2, "0");
-    return `${y}-${m}-${day} ${h}:${min}:${sec}`;
-  } catch {
-    return s;
-  }
 }
 
 type SearchField = "all" | "receiptNo" | "phone";
@@ -375,7 +359,8 @@ export default function CouponPurchasesPage() {
                   const event = r.event ?? r.eventName ?? r.reason ?? "—";
                   const status = r.status ?? r.state ?? (Number(amount) < 0 ? "사용" : "적립");
                   const createdAt = r.createdAt ?? r.occurredAt ?? r.date ?? r.time ?? "—";
-                  const ym = r.ym ?? r.month ?? r.useMonth ?? r.usedYm ?? r.usedMonth ?? "—";
+                  const ym =
+                    r.usedYearMonth ?? r.ym ?? r.month ?? r.useMonth ?? r.usedYm ?? r.usedMonth ?? "—";
 
                   return (
                     <tr key={r.id ?? receiptNo ?? i} className={i === 0 ? "sheet-selected" : ""}>
@@ -385,7 +370,7 @@ export default function CouponPurchasesPage() {
                       <td className="text-right text-gray-700">{formatNumber(remain)}</td>
                       <td className="text-gray-700">{String(event)}</td>
                       <td className="text-gray-700">{String(status)}</td>
-                      <td className="text-gray-600">{formatDate(String(createdAt))}</td>
+                      <td className="text-gray-600">{formatDateTimeKST(createdAt)}</td>
                       <td className="text-gray-700">{String(ym)}</td>
                     </tr>
                   );
@@ -452,7 +437,7 @@ export default function CouponPurchasesPage() {
                 <br />- 100만원 초과는 충전 불가
                 {budgetUpdatedAt ? (
                   <>
-                    <br />- 잔액 업데이트: {formatDate(String(budgetUpdatedAt))}
+                    <br />- 잔액 업데이트: {formatDateTimeKST(budgetUpdatedAt)}
                   </>
                 ) : null}
               </div>
@@ -570,7 +555,7 @@ export default function CouponPurchasesPage() {
                               <td className="text-right text-gray-700">{formatNumber(amount)}</td>
                               <td className="text-right text-gray-700">{formatNumber(after)}</td>
                               <td className="text-gray-700">{String(memo)}</td>
-                              <td className="text-gray-600">{formatDate(String(createdAt))}</td>
+                              <td className="text-gray-600">{formatDateTimeKST(createdAt)}</td>
                             </tr>
                           );
                         })
