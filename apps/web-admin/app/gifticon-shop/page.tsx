@@ -119,9 +119,6 @@ export default function GifticonShopPage() {
   };
 
   const openCatalog = () => {
-    if (mode === "none") {
-      openCreate();
-    }
     setCatalogOpen(true);
   };
 
@@ -439,6 +436,9 @@ export default function GifticonShopPage() {
         getAccessToken={getAccessToken}
         onSelect={applyCatalogItem}
         onImported={() => {
+          setMode("none");
+          setSelectedId("");
+          setDraft(toDraft());
           void refresh();
           showToast("ok", "기프티쇼 상품이 등록되었습니다.");
         }}
