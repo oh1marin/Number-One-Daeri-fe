@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Gift, Plus, RefreshCw, Search, ShoppingBag, Sparkles, X } from "lucide-react";
+import { Download, Gift, Plus, RefreshCw, Search, ShoppingBag, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import {
   type GifticonProduct,
+  type GiftishowCatalogItem,
+  catalogItemToDraft,
   createGifticonProduct,
   deleteGifticonProduct,
   fetchGifticonProducts,
@@ -13,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GifticonAppPreview } from "@/components/gifticon/GifticonAppPreview";
+import { GifticonCatalogPicker } from "@/components/gifticon/GifticonCatalogPicker";
 import { GifticonShopImageUpload } from "@/components/gifticon/GifticonShopImageUpload";
 import { GifticonShopProductCard } from "@/components/gifticon/GifticonShopProductCard";
 
@@ -67,6 +70,7 @@ export default function GifticonShopPage() {
   const [mode, setMode] = useState<EditMode>("none");
   const [draft, setDraft] = useState<Draft>(() => toDraft());
   const [selectedId, setSelectedId] = useState("");
+  const [catalogOpen, setCatalogOpen] = useState(false);
 
   const showToast = (type: "ok" | "err", msg: string) => {
     if (type === "ok") {
@@ -112,6 +116,21 @@ export default function GifticonShopPage() {
     setSelectedId("");
     setDraft(toDraft());
     setError("");
+  };
+
+  const openCatalog = () => {
+    if (mode === "none") {
+      openCreate();
+    }
+    setCatalogOpen(true);
+  };
+
+  const applyCatalogItem = (item: GiftishowCatalogItem) => {
+    const product = catalogItemToDraft(item);
+    setMode("create");
+    setSelectedId("");
+    setDraft(toDraft(product));
+    showToast("ok", "기프티쇼 상품 정보를 불러왔습니다. 마일리지 확인 후 등록하세요.");
   };
 
   const openEdit = (p: GifticonProduct) => {
@@ -199,6 +218,14 @@ export default function GifticonShopPage() {
               >
                 <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
                 새로고침
+              </Button>
+              <Button
+                variant="secondary"
+                className="bg-white/15 text-white border border-white/25 hover:bg-white/25"
+                onClick={openCatalog}
+              >
+                <Download className="w-4 h-4 mr-1.5" />
+                기프티쇼 불러오기
               </Button>
               <Button onClick={openCreate} className="bg-white text-indigo-700 hover:bg-indigo-50 font-semibold">
                 <Plus className="w-4 h-4 mr-1.5" />
@@ -332,7 +359,22 @@ export default function GifticonShopPage() {
                   </section>
 
                   <section className="space-y-3">
-                    <h3 className="text-sm font-semibold text-gray-900">② 상품 정보</h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900">② 상품 정보</h3>
+                      {mode === "create" ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => setCatalogOpen(true)}
+                          disabled={Boolean(busyId)}
+                        >
+                          <Download className="w-3.5 h-3.5 mr-1" />
+                          기프티쇼에서 선택
+                        </Button>
+                      ) : null}
+                    </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">상품명 *</label>
                       <Input
@@ -362,12 +404,12 @@ export default function GifticonShopPage() {
                       <Input
                         value={draft.id}
                         onChange={(e) => setDraft((s) => ({ ...s, id: e.target.value }))}
-                        placeholder="mega_americano_ice"
+                        placeholder="G00005791059"
                         disabled={mode === "edit" || Boolean(busyId)}
                         className="h-11 font-mono text-sm"
                       />
                       <p className="text-[11px] text-gray-400 mt-1">
-                        앱·API 식별용 코드. 등록 후 변경하지 않는 것을 권장합니다.
+                        기프티쇼 상품 코드(G000…). 「기프티쇼에서 선택」으로 자동 입력할 수 있습니다.
                       </p>
                     </div>
                   </section>
@@ -390,6 +432,17 @@ export default function GifticonShopPage() {
           </div>
         </div>
       ) : null}
+
+      <GifticonCatalogPicker
+        open={catalogOpen}
+        onClose={() => setCatalogOpen(false)}
+        getAccessToken={getAccessToken}
+        onSelect={applyCatalogItem}
+        onImported={() => {
+          void refresh();
+          showToast("ok", "기프티쇼 상품이 등록되었습니다.");
+        }}
+      />
     </div>
   );
 }
