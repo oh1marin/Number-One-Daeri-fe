@@ -82,8 +82,9 @@ export function GifticonCatalogPicker({ open, onClose, getAccessToken, onSelect,
 
   const runSearch = () => {
     const q = searchInput.trim();
-    if (q && q.length < 2) {
-      setError("검색어는 2글자 이상 입력해 주세요.");
+    const isGoodsCode = /^G\d{5,}$/i.test(q);
+    if (q && q.length < 2 && !isGoodsCode) {
+      setError("검색어는 2글자 이상 입력해 주세요. (상품코드 G000… 는 바로 조회)");
       return;
     }
     setError("");
@@ -121,7 +122,7 @@ export function GifticonCatalogPicker({ open, onClose, getAccessToken, onSelect,
           <div>
             <h2 className="text-lg font-bold text-gray-900">기프티쇼 상품 불러오기</h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              검색·브랜드 필터 또는 페이지 탐색 (전체 2,000개를 한 번에 불러오지 않습니다)
+              검색·브랜드는 전체 목록에서 찾습니다 (최초 1회 준비 후 캐시). 코드(G000…)는 즉시 조회
             </p>
           </div>
           <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-white/80 text-gray-500">
@@ -184,7 +185,7 @@ export function GifticonCatalogPicker({ open, onClose, getAccessToken, onSelect,
           {loading ? (
             <div className="flex items-center justify-center py-16 text-gray-500 gap-2">
               <Loader2 className="w-5 h-5 animate-spin" />
-              불러오는 중…
+              {appliedQ || brandCode ? "목록 준비·검색 중… (최초 1회 10~20초)" : "불러오는 중…"}
             </div>
           ) : items.length === 0 ? (
             <div className="text-center py-16 text-gray-500 text-sm">
