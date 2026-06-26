@@ -3,10 +3,10 @@ import { FeatureIcons } from "@/components/Icons";
 import { SiApple, SiGoogleplay } from "react-icons/si";
 import { fetchNotices } from "@/lib/notices";
 import BusinessInfoBlock from "@/components/BusinessInfoBlock";
-import { SERVICE_PRODUCTS } from "@/lib/companyInfo";
+import { APP_LINKS, SERVICE_PRODUCTS } from "@/lib/companyInfo";
 
-const APP_STORE_URL = process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() || "";
-const GOOGLE_PLAY_URL = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL?.trim() || "";
+const APP_STORE_URL = process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() || APP_LINKS.appStore;
+const GOOGLE_PLAY_URL = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL?.trim() || APP_LINKS.googlePlay;
 
 const FEATURES = [
   { icon: "fast", title: "빠른 배차", desc: "가까운 기사를 찾아 신속하게 배차해 드립니다." },

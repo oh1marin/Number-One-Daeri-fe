@@ -18,6 +18,12 @@ export const COMPANY = {
   fax: "031-247-1988",
 } as const;
 
+/** 앱 스토어 링크 — env 미설정 시 기본값 사용 */
+export const APP_LINKS = {
+  googlePlay: "https://play.google.com/store/apps/details?id=com.numberonedaeri.app",
+  appStore: "",
+} as const;
+
 /** 앱·백엔드와 동일한 거리(km)당 요금 (원) — rides/estimate 기준 */
 export const SERVICE_PRODUCTS = [
   {
