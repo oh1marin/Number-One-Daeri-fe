@@ -372,11 +372,7 @@ export default function MileageManagePage() {
                 {submitting ? "처리 중…" : mode === "earn" ? "적립 반영" : "차감 반영"}
               </button>
               <p className="text-[10px] text-[var(--sheet-btn-danger-text)] leading-snug bg-[var(--sheet-btn-danger-bg)] border border-[var(--sheet-border)] px-2 py-2">
-                차감 시 잔액이 음수면 거절됩니다. 대량 반영은{" "}
-                <Link href="/rides/bulk-import" className="underline text-blue-800">
-                  엑셀자료등록
-                </Link>
-                .
+                차감 시 잔액이 음수면 거절됩니다.
               </p>
             </div>
           </div>

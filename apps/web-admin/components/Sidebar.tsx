@@ -19,22 +19,16 @@ const GROUPS: { label: string; icon: LucideIcon; items: { href: string; label: s
     icon: LayoutDashboard,
     items: [
       { href: "/", label: "대시보드" },
-      { href: "/daily", label: "운행일보" },
-      { href: "/rides/new", label: "콜 입력" },
-      { href: "/rides/bulk-import", label: "엑셀자료등록" },
-      { href: "/rides", label: "콜 조회" },
       { href: "/order-status", label: "오더현황" },
       { href: "/order-stats", label: "오더통계현황" },
     ],
   },
   {
-    label: "고객/기사",
+    label: "고객",
     icon: Users,
     items: [
       { href: "/customers", label: "고객자료관리" },
       { href: "/customers/ledger", label: "고객관리대장" },
-      { href: "/drivers", label: "기사님 관리" },
-      { href: "/attendance", label: "기사 근태관리" },
     ],
   },
   {

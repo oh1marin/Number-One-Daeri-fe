@@ -4,7 +4,6 @@ import { hasAdminWebSession } from "@/lib/auth";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -171,9 +170,6 @@ export default function OrderStatusPage() {
           <h1 className="text-xl font-bold leading-none">오더 현황</h1>
           <p className="text-xs text-gray-500 mt-1">전체 목록 조회</p>
         </div>
-        <Link href="/rides" className="text-xs text-blue-700 hover:underline">
-          콜 조회
-        </Link>
       </div>
 
       <div className="sheet-panel">

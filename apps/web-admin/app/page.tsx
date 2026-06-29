@@ -7,13 +7,12 @@ import { getRecords } from "@/lib/store";
 import { useAuth } from "@/lib/AuthContext";
 import { hasAdminWebSession } from "@/lib/auth";
 import { adminCredentialsInit } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-/** API recentRides / driverSummary 항목 타입 */
+/** API recentRides 항목 타입 */
 interface RecentRide {
   id?: string;
   date?: string;
@@ -21,12 +20,6 @@ interface RecentRide {
   driverName?: string;
   pickup?: string;
   total?: number;
-}
-interface DriverSummaryItem {
-  driverName?: string;
-  name?: string;
-  count?: number;
-  amount?: number;
 }
 
 export default function DashboardPage() {
@@ -42,7 +35,6 @@ export default function DashboardPage() {
     totalAmount: number;
     todayAmount: number;
     recentRides: RecentRide[];
-    driverSummary: DriverSummaryItem[];
   } | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -75,9 +67,6 @@ export default function DashboardPage() {
             totalAmount: d.totalAmount ?? 0,
             todayAmount: d.todayAmount ?? 0,
             recentRides: Array.isArray(d.recentRides) ? d.recentRides : [],
-            driverSummary: Array.isArray(d.driverSummary)
-              ? d.driverSummary
-              : [],
           });
         }
         if (cardRes?.data) setTodayCard(cardRes.data);
@@ -100,18 +89,6 @@ export default function DashboardPage() {
   const recent = dashboard?.recentRides?.length
     ? dashboard.recentRides.slice(0, 8)
     : [...records].reverse().slice(0, 8);
-  const driverList: DriverSummaryItem[] = dashboard?.driverSummary?.length
-    ? dashboard.driverSummary
-    : Array.from(new Set(records.map((r) => r.driverName).filter(Boolean))).map(
-        (driver) => {
-          const driverRecs = records.filter((r) => r.driverName === driver);
-          return {
-            driverName: driver,
-            count: driverRecs.length,
-            amount: driverRecs.reduce((s, r) => s + r.total, 0),
-          };
-        },
-      );
 
   const CARDS = [
     {
@@ -146,14 +123,11 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-6xl">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6">
         <div>
           <h1 className="text-2xl font-bold">대시보드</h1>
           <p className="text-gray-500 text-sm mt-1">{todayStr} 기준</p>
         </div>
-        <Button asChild>
-          <Link href="/rides/new">+ 콜 입력</Link>
-        </Button>
       </div>
 
       {apiError && (
@@ -221,16 +195,16 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {/* Recent Records */}
-        <div className="lg:col-span-2 sheet-wrap overflow-hidden">
+        <div className="sheet-wrap overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-[var(--sheet-header-bg)]">
-            <h2 className="font-semibold">최근 입력 내역</h2>
+            <h2 className="font-semibold">최근 운행</h2>
             <Link
-              href="/rides"
+              href="/order-status"
               className="text-xs text-blue-600 hover:underline"
             >
-              전체보기
+              오더현황 보기
             </Link>
           </div>
           <div className="overflow-x-auto">
@@ -239,7 +213,6 @@ export default function DashboardPage() {
                 <tr>
                   <th className="px-4 py-2.5 text-left">날짜</th>
                   <th className="px-4 py-2.5 text-left">고객명</th>
-                  <th className="px-4 py-2.5 text-left">기사</th>
                   <th className="px-4 py-2.5 text-left">출발지</th>
                   <th className="px-4 py-2.5 text-right">합계</th>
                 </tr>
@@ -248,10 +221,10 @@ export default function DashboardPage() {
                 {recent.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={4}
                       className="px-4 py-8 text-center text-gray-400"
                     >
-                      입력된 데이터가 없습니다.
+                      데이터가 없습니다.
                     </td>
                   </tr>
                 ) : (
@@ -263,7 +236,6 @@ export default function DashboardPage() {
                       <td className="px-4 py-2.5 font-medium">
                         {r.customerName ?? ""}
                       </td>
-                      <td className="px-4 py-2.5">{r.driverName ?? ""}</td>
                       <td className="px-4 py-2.5 text-gray-500">
                         {r.pickup ?? ""}
                       </td>
@@ -277,38 +249,6 @@ export default function DashboardPage() {
             </table>
           </div>
         </div>
-
-        {/* Driver Summary */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">기사별 현황</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 space-y-2">
-            {driverList.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-6">데이터 없음</p>
-            ) : (
-              driverList.map((d, i) => {
-                const name = d.driverName ?? d.name ?? "";
-                const count = d.count ?? 0;
-                const amount = d.amount ?? 0;
-                return (
-                  <div
-                    key={name ? `${name}-${i}` : `driver-${i}`}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-indigo-50 transition-colors"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{name}</p>
-                      <Badge variant="secondary" className="mt-0.5 text-[10px]">{count}건</Badge>
-                    </div>
-                    <p className="text-sm font-bold text-indigo-600">
-                      {amount.toLocaleString()}원
-                    </p>
-                  </div>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
