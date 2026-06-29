@@ -57,6 +57,7 @@ const GROUPS: { label: string; icon: LucideIcon; items: { href: string; label: s
       { href: "/recommendation-kings", label: "추천왕 리스트" },
       { href: "/mileage/history", label: "마일리지 적립현황" },
       { href: "/mileage/manage", label: "마일리지 관리" },
+      { href: "/mileage/ride-complete", label: "마일리지 결제내역" },
       { href: "/mileage/errors", label: "마일리지 오류현황" },
       { href: "/withdrawals", label: "출금요청 관리" },
     ],
