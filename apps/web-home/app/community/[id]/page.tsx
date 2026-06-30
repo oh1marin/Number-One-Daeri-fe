@@ -2,12 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchNoticeById } from "@/lib/notices";
+import { createPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const notice = await fetchNoticeById(id);
-  if (!notice) return { title: "공지사항 | 일등대리" };
-  return { title: `${notice.title} | 일등대리` };
+  if (!notice) {
+    return createPageMetadata({ title: "공지사항", path: "/community" });
+  }
+  return createPageMetadata({
+    title: notice.title,
+    description: notice.title,
+    path: `/community/${id}`,
+  });
 }
 
 export default async function NoticeDetailPage({ params }: { params: Promise<{ id: string }> }) {

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { ValueIcons } from "@/components/Icons";
 import BusinessInfoBlock from "@/components/BusinessInfoBlock";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "회사소개 | 일등대리",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "회사소개",
+  description: "일등대리(마린소프트) 회사 소개. 안전·신속·신뢰를 바탕으로 한 대리운전 서비스를 제공합니다.",
+  path: "/about",
+});
 
 const VALUES = [
   { icon: "safe", title: "안전", desc: "전문 기사가 안전하게 운전해 고객을 모십니다." },

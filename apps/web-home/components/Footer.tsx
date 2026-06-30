@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { COMPANY } from "@/lib/companyInfo";
+import { COMPANY, APP_LINKS } from "@/lib/companyInfo";
 
 const linkClass = "text-gray-400 hover:text-white transition";
 
@@ -26,6 +26,16 @@ export default function Footer() {
               <Link href="/contact" className={linkClass}>
                 상담문의
               </Link>
+              {APP_LINKS.googlePlay ? (
+                <a
+                  href={APP_LINKS.googlePlay}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  Google Play 앱
+                </a>
+              ) : null}
             </div>
           </div>
 

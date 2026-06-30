@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchNotices } from "@/lib/notices";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "공지사항 | 일등대리",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "공지사항",
+  description: "일등대리 서비스 공지, 이벤트, 업데이트 소식을 확인하세요.",
+  path: "/community",
+});
 
 export default async function CommunityPage() {
   const notices = await fetchNotices();

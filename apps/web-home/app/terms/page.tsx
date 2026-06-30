@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import BusinessInfoBlock from "@/components/BusinessInfoBlock";
 import { COMPANY } from "@/lib/companyInfo";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "이용약관 | 일등대리",
-  description: "일등대리 서비스 이용약관",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "이용약관",
+  description: "일등대리 대리운전 서비스 이용약관 및 이용 조건.",
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (

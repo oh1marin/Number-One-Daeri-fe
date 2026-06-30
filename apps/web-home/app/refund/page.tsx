@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { COMPANY } from "@/lib/companyInfo";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "환불정책 | 일등대리",
-  description: "일등대리 서비스 환불 및 취소 정책",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "환불정책",
+  description: "일등대리 대리운전 및 디지털 상품 환불·취소 정책 안내.",
+  path: "/refund",
+});
 
 export default function RefundPage() {
   const updatedAt = "2026-05-04";

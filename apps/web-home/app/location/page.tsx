@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import KakaoMap from "@/components/KakaoMap";
 import { LocationIcons } from "@/components/Icons";
 import { COMPANY } from "@/lib/companyInfo";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "오시는길 | 일등대리",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "오시는길",
+  description: `일등대리 사업장 주소: ${COMPANY.fullAddress}. 지도와 연락처 안내.`,
+  path: "/location",
+});
 
 export default function LocationPage() {
   return (

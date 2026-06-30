@@ -1,9 +1,26 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FeatureIcons } from "@/components/Icons";
 import { SiApple, SiGoogleplay } from "react-icons/si";
 import { fetchNotices } from "@/lib/notices";
 import BusinessInfoBlock from "@/components/BusinessInfoBlock";
+import JsonLd from "@/components/JsonLd";
 import { APP_LINKS, SERVICE_PRODUCTS } from "@/lib/companyInfo";
+import {
+  createPageMetadata,
+  faqJsonLd,
+  FAQ_ITEMS,
+  mobileAppJsonLd,
+  serviceJsonLd,
+} from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "일등대리 — 안전하고 빠른 대리운전 앱",
+  description:
+    "앱으로 간편 호출하는 일등대리 대리운전. 실시간 배차, 카드·마일리지 결제, 기프티콘 교환. Google Play에서 무료 설치.",
+  path: "/",
+  absoluteTitle: true,
+});
 
 const APP_STORE_URL = process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() || APP_LINKS.appStore;
 const GOOGLE_PLAY_URL = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL?.trim() || APP_LINKS.googlePlay;
@@ -29,13 +46,22 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd
+        data={[
+          serviceJsonLd(),
+          ...(mobileAppJsonLd() ? [mobileAppJsonLd()!] : []),
+          faqJsonLd(),
+        ]}
+      />
       {/* Hero — home 배경 + 문구 유지 */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-950 via-blue-950 to-gray-900 text-white">
-        <img
+        <Image
           src="/images/home.png"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
-          aria-hidden
+          alt="일등대리 대리운전 앱 — 안전하고 빠른 호출 서비스"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center opacity-70"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/75 to-blue-950/40" aria-hidden />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(59,130,246,0.12),_transparent_55%)]" aria-hidden />
@@ -213,6 +239,26 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* FAQ — 검색·AI 답변 노출용 */}
+      <section className="py-20 px-6 bg-slate-50 border-y border-gray-100" aria-labelledby="faq-heading">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 id="faq-heading" className="text-2xl md:text-3xl font-bold mb-3">
+              자주 묻는 질문
+            </h2>
+            <p className="text-gray-500 text-sm">일등대리 대리운전 서비스 이용 안내</p>
+          </div>
+          <dl className="space-y-4">
+            {FAQ_ITEMS.map((item) => (
+              <div key={item.question} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <dt className="font-semibold text-gray-900 mb-2">{item.question}</dt>
+                <dd className="text-sm text-gray-600 leading-relaxed">{item.answer}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
       {/* 사업자 정보 (PG — 주소 명시) */}
       <section className="py-16 px-6 bg-gray-50 border-y border-gray-100">
         <div className="max-w-6xl mx-auto">
@@ -227,10 +273,12 @@ export default async function HomePage() {
           <p className="text-gray-400 mb-8">신규 가입 시 1만원, 친구 추천 이벤트 진행 중!</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="#download"
+              href={GOOGLE_PLAY_URL || "#download"}
+              target={GOOGLE_PLAY_URL ? "_blank" : undefined}
+              rel={GOOGLE_PLAY_URL ? "noopener noreferrer" : undefined}
               className="px-8 py-3 bg-brand rounded-xl font-semibold hover:bg-brand-hover transition shadow-lg shadow-brand/30 focus-visible:ring-2 focus-visible:ring-brand-muted focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
             >
-              앱 다운로드
+              Google Play에서 설치
             </a>
             <Link
               href="/about"

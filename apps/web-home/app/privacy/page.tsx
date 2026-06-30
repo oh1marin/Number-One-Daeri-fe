@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import BusinessInfoBlock from "@/components/BusinessInfoBlock";
 import { COMPANY } from "@/lib/companyInfo";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "개인정보처리방침 | 일등대리",
-  description: "일등대리 서비스 개인정보처리방침",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "개인정보처리방침",
+  description: "일등대리 대리운전 앱 개인정보 수집·이용·보관 및 이용자 권리 안내.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   const updatedAt = "2026-04-27";

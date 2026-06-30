@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BusinessInfoBlock from "@/components/BusinessInfoBlock";
 import { DIGITAL_PRODUCTS, SERVICE_PRODUCTS } from "@/lib/companyInfo";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "서비스 및 요금 | 일등대리",
-  description: "일등대리 대리운전 서비스 상품 및 요금 안내",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "서비스 및 요금",
+  description:
+    "일등대리 대리운전 요금표. 일반·빠른·프리미엄 km당 요금과 마일리지 기프티콘 상품 가격을 안내합니다.",
+  path: "/services",
+});
 
 function formatWon(n: number) {
   return `${n.toLocaleString("ko-KR")}원`;
